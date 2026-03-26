@@ -1,28 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');
 
 :root {
-  --red-vivid:     #E53935;   /* após lightouse: mais luminoso */
-  --red-dark:      #B71C1C;
+  --red-vivid:     #FF4D4D;   /* após lightouse: mais luminoso */
+  --red-dark:      #D32F2F;
 
-  --red-glow:      rgba(212, 43, 43, 0.15);
+  --red-glow:      rgba(255, 77, 77, 0.15);
   --red-glow-strong: rgba(212, 43, 43, 0.30);
 
 /* após lighthouse: melhorar separação 1- ESCURIDAO + 2/ CONTRASTE + ESCURIDAO++*/
-  --carbon:        #111214;
-  --carbon-mid:    #181A1F;
-  --carbon-light:  #22252B;
-  --steel:         #3A3D44;
-  --steel-light:   #54575E;
+  --carbon:        #0D0E10;   /* Levemente mais escuro para aumentar contraste com texto */
+  --carbon-mid:    #14161A;
+  --carbon-light:  #1E2126;
+  --steel:         #454952;
 
-  --chrome:        #C8CACF;
-  --chrome-dim:    #858890;
-  --off-white:     #ECEDEF;
-  --text-body:     #D6D8DD;
-  --text-dim:      #A2A6AE;
+  --chrome:        #F0F1F3;   /* Próximo ao branco para leitura principal */
+  --chrome-dim:    #B0B3B8;   /* Antes era #858890 (baixa acessibilidade) */
+  --off-white:     #FFFFFF;
+  --text-body:     #E4E6EB;   /* Texto principal mais claro */
+  --text-dim:      #B0B3B8;   /* Texto secundário ajustado para passar no WCAG */
 
   /* após lighthouse: contraste aumentado, diferença aumentada */
-  --border-subtle: rgba(255,255,255,0.10);
-  --border-mid:    rgba(255,255,255,0.18);
+  --border-subtle: rgba(255,255,255,0.15);
+  --border-mid:    rgba(255,255,255,0.25);
   --border-accent: rgba(212,43,43,0.40);
 
   --shadow-card:   0 8px 32px rgba(0,0,0,0.55);

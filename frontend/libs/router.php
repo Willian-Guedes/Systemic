@@ -152,14 +152,14 @@ class Router
     public function dispatch(string $path, string $method): void
     {
         if (self::debug_enabled) 
-            {
+        {
             error_log("[Router] RAW path: '$path' | method: '$method'");
             error_log("[Router] REQUEST_URI: " . ($_SERVER['REQUEST_URI'] ?? 'N/A'));
             error_log("[Router] SCRIPT_NAME: " . ($_SERVER['SCRIPT_NAME'] ?? 'N/A'));
             header('X-Debug-Path: ' . $path);
             header('X-Debug-Method: ' . $method);
         }
-        
+
         $method = strtoupper($method);
         $path = parse_url($path, PHP_URL_PATH);
         

@@ -37,7 +37,7 @@ function build_user_initials(string $nome): string
  * Serve uma página protegida injetando os dados do usuário logado como
  * window.__session_user, para que o JS preencha o sidebar corretamente.
  *
- * Sempre chamar no lugar de serve_page() em rotas que exigem autenticação.
+ * Sempre chamar no lugar de serve_page() em rotas que exigem autenticação bem legal.
  */
 function serve_protected_page(string $base_href, string $file_path): void
 {

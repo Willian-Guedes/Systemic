@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');
+
+:root {
+    --red-vivid:     #ac2a2a;
+    --red-dark:      #D32F2F;
+    --red-glow:      rgba(255, 77, 77, 0.15);
+    --red-glow-strong: rgba(212, 43, 43, 0.30);
+
+    --carbon:        #0D0E10;
+    --carbon-mid:    #14161A;
+    --carbon-light:  #1E2126;
+    --steel:         #454952;
+
+    --chrome:        #F0F1F3;
+    --chrome-dim:    #B0B3B8;
+    --off-white:     #FFFFFF;
+    --text-body:     #E4E6EB;
+    --text-dim:      #B0B3B8;
+
+    --border-subtle: rgba(255,255,255,0.15);
+    --border-mid:    rgba(255,255,255,0.25);
+    --border-accent: rgba(212,43,43,0.40);
+
+    --shadow-card:   0 8px 32px rgba(0,0,0,0.55);
+    --shadow-red:    0 0 28px rgba(212,43,43,0.35);
+    --shadow-deep:   0 20px 60px rgba(0,0,0,0.7);
+
+    --radius-sm:     4px;
+    --radius-md:     8px;
+    --radius-lg:     16px;
+
+    --font-display:  'Barlow Condensed', sans-serif;
+    --font-body:     'Barlow', sans-serif;
+    --transition:    0.26s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+body {
+    background-color: var(--carbon);
+    color: var(--text-body);
+    font-family: var(--font-body);
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────────────── */
+
+.navbar {
+    background-color: var(--carbon-mid);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+/* ── Card principal ──────────────────────────────────────────────────────── */
+
+.main-card {
+    background-color: var(--carbon-light);
+    border: 1px solid var(--border-mid);
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+/* ── Carousel ────────────────────────────────────────────────────────────── */
+
+#productCarousel {
+    background-color: var(--carbon-mid);
+}
+
+.carousel-item {
+    height: 420px;
+}
+
+.carousel-item img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    padding: 20px;
+    background-color: var(--carbon-light);
+}
+
+/* ── Preço e botões ──────────────────────────────────────────────────────── */
+
+.price {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--red-vivid);
+    font-family: var(--font-display);
+}
+
+.btn-red {
+    background-color: var(--red-vivid);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: var(--transition);
+}
+
+.btn-red:hover:not(:disabled) {
+    background-color: var(--red-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-red);
+    color: white;
+}
+
+.btn-red:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+
+.badge-red {
+    background-color: var(--red-vivid);
+    color: white;
+    font-weight: 600;
+}
+
+.badge-esgotado {
+    background-color: var(--steel) !important;
+}
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+
+.nav-tabs .nav-link {
+    color: var(--text-dim);
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--red-vivid);
+    border-bottom: 3px solid var(--red-vivid);
+    background-color: transparent;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.text-muted,
+.text-dim {
+    color: var(--text-dim) !important;
+}
+
+/* ── Cards de relacionados ───────────────────────────────────────────────── */
+
+.card-relacionado-link {
+    text-decoration: none;
+    display: block;
+}
+
+.card {
+    background-color: var(--carbon-light);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+}
+
+.card:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-red);
+    transform: translateY(-4px);
+}
+
+.card h6 {
+    color: var(--off-white);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+}
+
+.preco-relacionado {
+    color: var(--red-vivid);
+    font-weight: 700;
+    font-size: 1.1rem;
+    font-family: var(--font-display);
+    margin-bottom: 0;
+}
+
+/* ── Estados de loading e erro ───────────────────────────────────────────── */
+
+#estado-loading,
+#estado-erro {
+    min-height: 40vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Responsividade ──────────────────────────────────────────────────────── */
+
+@media (max-width: 991px) {
+    .carousel-item {
+        height: 280px;
+    }
+}

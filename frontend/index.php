@@ -161,13 +161,33 @@ $router->post('/cadastro/criar', function () {
     CadastroController::handle_criar();
 });
 
-foreach (['/servicos', '/pedir', '/busca'] as $rota) {
+foreach (['/servicos', '/pedir'] as $rota) {
     $router->get($rota, function () use ($rota) {
         http_response_code(200);
         header('Content-Type: text/html; charset=UTF-8');
         echo "<h2 style='font-family:sans-serif;padding:2rem'>Página <code>{$rota}</code> em construção.</h2>";
     });
 }
+
+/*
+ * GET /busca?q=:termo&categoria=:cat&pagina=:n
+ *
+ * Página de resultados de busca pública (não exige login).
+ * O JavaScript da página consome /api/busca para obter os dados.
+ */
+$router->get('/busca', function () {
+    serve_page('/pages/busca/', __DIR__ . '/pages/busca/busca.html');
+});
+
+/*
+ * GET /api/busca?q=:termo&categoria=:cat&pagina=:n
+ *
+ * API JSON de busca de produtos — pública, sem autenticação.
+ * Toda a sanitização e validação ocorre dentro do endpoint.
+ */
+$router->get('/api/busca', function () {
+    include __DIR__ . '/api/busca.php';
+});
 
 // ── Dispatch ──────────────────────────────────────────────────────────────
 

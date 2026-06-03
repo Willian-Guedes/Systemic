@@ -1,0 +1,23 @@
+{
+    "name": "systemic/tests",
+    "description": "Testes unitários do backend Systemic (Automax)",
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "classmap": [
+            "./frontend/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:auth": "phpunit --filter AuthControllerTest",
+        "test:cadastro": "phpunit --filter CadastroControllerTest",
+        "test:produto": "phpunit --filter ProdutoControllerTest"
+    }
+}

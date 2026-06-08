@@ -100,6 +100,7 @@ Qualquer coisa peça pelo código html da página homepage para ver o design, ma
 
 
 Ao criar diretórios, não utilize {} em comandos como o mkdir, pois eles quebram.
+Sempre programe com segurança em mente, com headers seguros e aplicações seguras.
 Exemplo: ``mkdir -p {algo}`` ou qualquer coisa com {} para representar multiplos diretórios
 
 

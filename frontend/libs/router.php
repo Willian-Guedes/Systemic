@@ -82,7 +82,10 @@ class Router
 
     protected array $routes = [];
     private string $staticDir;
-    private const debug_enabled = true;
+    private static function debug_enabled(): bool
+    {
+        return ($_ENV['APP_DEBUG'] ?? getenv('APP_DEBUG') ?: 'false') === 'true';
+    }
     private string $basePath;   
 
     public function __construct(string $staticDir = __DIR__ . '/../pages', string $basePath = '')
@@ -151,7 +154,7 @@ class Router
 
     public function dispatch(string $path, string $method): void
     {
-        if (self::debug_enabled) 
+        if (self::debug_enabled())
         {
             error_log("[Router] RAW path: '$path' | method: '$method'");
             error_log("[Router] REQUEST_URI: " . ($_SERVER['REQUEST_URI'] ?? 'N/A'));

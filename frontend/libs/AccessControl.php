@@ -54,13 +54,13 @@ class AccessControl
 
     /*
      * Encerra a requisição com 403 se o usuário não tiver a permissão.
+     * Garante que haja sessão ativa antes de verificar o nível — sem isso,
+     * um usuário não autenticado receberia 403 em vez de ser redirecionado ao login.
      * Sempre chamado antes de servir uma página ou executar uma ação sensível.
      */
     public static function exigir_permissao(string $permissao): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        AuthController::exigir_autenticacao();
 
         $nivel = $_SESSION['nivel_de_acesso'] ?? '';
 

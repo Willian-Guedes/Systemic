@@ -23,6 +23,24 @@ let srtD   = 'desc';
 let pg     = 1;
 const PG   = 8;
 
+/* ═══════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════ */
+/*
+ * Escapa caracteres HTML especiais antes de interpolar em innerHTML.
+ * Qualquer dado que venha do banco ou de input do usuário deve passar por aqui.
+ * Usar textContent/setAttribute é preferível quando possível, mas dentro de
+ * template literals de innerHTML esta função é a barreira contra XSS armazenado.
+ */
+function esc(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g,  '&amp;')
+    .replace(/</g,  '&lt;')
+    .replace(/>/g,  '&gt;')
+    .replace(/"/g,  '&quot;')
+    .replace(/'/g,  '&#39;');
+}
 /* ── Mapas de dados (mock) ─────────────────── */
 const veicMap = {
   '1': [{ id:1, label:'Honda Civic 2018 — ABC3D45' }, { id:2, label:'Jeep Compass 2022 — KLM7N89' }],
@@ -227,13 +245,13 @@ function renderTbl() {
         ${isVip ? '<span class="bdg b-purple" style="margin-top:3px"><i class="bi bi-star-fill" aria-hidden="true"></i>VIP</span>' : ''}
       </td>
       <td><div style="font-size:12px">${fd(o.abertura)}</div></td>
-      <td><div style="font-size:13px;font-weight:500">${fn}</div></td>
-      <td><div style="font-weight:600;font-size:13px">${cli}</div></td>
+      <td><div style="font-size:13px;font-weight:500">${esc(fn)}</div></td>
+      <td><div style="font-weight:600;font-size:13px">${esc(cli)}</div></td>
       <td>
-        <div style="font-size:12px;color:var(--chrome-dim)">${vnome}</div>
-        <span class="bdg b-steel" style="margin-top:3px">${placa}</span>
+        <div style="font-size:12px;color:var(--chrome-dim)">${esc(vnome)}</div>
+        <span class="bdg b-steel" style="margin-top:3px">${esc(placa)}</span>
       </td>
-      <td><span class="bdg ${tb2}">${tl}</span></td>
+      <td><span class="bdg ${tb2}">${esc(tl)}</span></td>
       <td><div style="font-size:12px">${fd(o.prazo)}${venc}</div></td>
       <td>
         <div style="display:flex;gap:5px;align-items:center">
@@ -313,9 +331,9 @@ function renderKanban() {
         aria-label="Abrir detalhes da OS ${o.id_ordem}"
         onkeydown="if(event.key==='Enter')verDet(${o.id_ordem})">
         <div class="osc-num">#${String(o.id_ordem).padStart(4,'0')}</div>
-        <div class="osc-cli">${cli}${isVip ? ' ⭐' : ''}</div>
-        <div class="osc-pla"><i class="bi bi-car-front" aria-hidden="true" style="margin-right:4px"></i>${placa}</div>
-        <div class="osc-typ"><i class="bi bi-wrench" aria-hidden="true" style="margin-right:5px"></i>${tipoLabel[o.tipo_ordem]||o.tipo_ordem}</div>
+        <div class="osc-cli">${esc(cli)}${isVip ? ' ⭐' : ''}</div>
+        <div class="osc-pla"><i class="bi bi-car-front" aria-hidden="true" style="margin-right:4px"></i>${esc(placa)}</div>
+        <div class="osc-typ"><i class="bi bi-wrench" aria-hidden="true" style="margin-right:5px"></i>${esc(tipoLabel[o.tipo_ordem]||o.tipo_ordem)}</div>
         <div class="osc-dt"><i class="bi bi-calendar3" aria-hidden="true" style="margin-right:5px"></i>Prazo: ${fd(o.prazo)}</div>
         <div class="osc-foot">
           <div class="osc-val">${fc(o.orcamento)}</div>
@@ -358,6 +376,7 @@ function abrirNova() {
   document.getElementById('oOrc').value = '';
   const hoje = new Date().toISOString().split('T')[0];
   document.getElementById('oAb').value  = hoje;
+  document.getElementById('oAb').max    = hoje;
   document.getElementById('oPr').value  = '';
   document.getElementById('oPr').min    = hoje;
   document.getElementById('oFech').value = '';
@@ -388,6 +407,7 @@ function editarOS(id) {
   popVeic(o.id_veiculo);
   document.getElementById('oTipo').value  = o.tipo_ordem;
   document.getElementById('oAb').value    = o.abertura || '';
+  document.getElementById('oAb').max      = new Date().toISOString().split('T')[0];
   document.getElementById('oPr').value    = o.prazo    || '';
   document.getElementById('oDiag').value  = o.diagnostico || '';
   document.getElementById('oMO').value    = o.mao_de_obra  || '';
@@ -423,8 +443,15 @@ function salvarOS() {
   if (errs.length) { showVali(`Preencha: ${errs.join(', ')}.`); return; }
 
   const hoje = new Date().toISOString().split('T')[0];
+  if (ab > hoje) {
+    showVali('A data de abertura não pode ser uma data futura.'); return;
+  }
   if (!editId && pr < hoje) {
     showVali('O prazo previsto não pode ser uma data passada.'); return;
+  }
+  if (editId && pr < hoje) {
+    showVali('Atenção: o prazo definido já está vencido. Salvo assim mesmo.');
+    // Não retorna — apenas avisa. O gestor pode precisar registrar retroativamente.
   }
   if (pr < ab) {
     showVali('O prazo previsto não pode ser anterior à data de abertura.'); return;
@@ -540,7 +567,7 @@ function verDet(id) {
         <tbody>
           ${(o.pecas || []).map(p =>
             `<tr>
-              <td>${p.nome}</td>
+              <td>${esc(p.nome)}</td>
               <td>${p.qtd}</td>
               <td>${fc(p.valor)}</td>
               <td style="font-family:var(--font-mono);color:var(--green)">${fc(p.valor * p.qtd)}</td>
@@ -571,9 +598,9 @@ function verDet(id) {
 
     <div class="row g-0">
       <div class="col-md-6">
-        <div class="dr"><span class="dl">Funcionário</span>   <span class="dv">${fn}</span></div>
-        <div class="dr"><span class="dl">Cliente</span>       <span class="dv">${cli}${isVip?' ⭐':''}</span></div>
-        <div class="dr"><span class="dl">Veículo / Placa</span><span class="dv">${veic}</span></div>
+        <div class="dr"><span class="dl">Funcionário</span>   <span class="dv">${esc(fn)}</span></div>
+        <div class="dr"><span class="dl">Cliente</span>       <span class="dv">${esc(cli)}${isVip?' ⭐':''}</span></div>
+        <div class="dr"><span class="dl">Veículo / Placa</span><span class="dv">${esc(veic)}</span></div>
         <div class="dr"><span class="dl">Abertura</span>      <span class="dv">${fd(o.abertura)}</span></div>
         <div class="dr">
           <span class="dl">Prazo Previsto</span>
@@ -597,11 +624,11 @@ function verDet(id) {
         </div>
         <div class="dr">
           <span class="dl">Diagnóstico</span>
-          <span class="dv" style="line-height:1.6">${o.diagnostico || '<span style="color:var(--text-faint)">Não informado</span>'}</span>
+          <span class="dv" style="line-height:1.6">${o.diagnostico ? esc(o.diagnostico) : '<span style="color:var(--text-faint)">Não informado</span>'}</span>
         </div>
         <div class="dr">
           <span class="dl">Conclusão</span>
-          <span class="dv" style="line-height:1.6">${o.conclusao_ordem || '<span style="color:var(--text-faint)">OS ainda não fechada</span>'}</span>
+          <span class="dv" style="line-height:1.6">${o.conclusao_ordem ? esc(o.conclusao_ordem) : '<span style="color:var(--text-faint)">OS ainda não fechada</span>'}</span>
         </div>
       </div>
     </div>
@@ -624,7 +651,7 @@ function verDet(id) {
           </div>
           <div class="tl-con">
             <div class="tl-tit">OS Aberta</div>
-            <div class="tl-tm">${fd(o.abertura)} — ${fn}</div>
+            <div class="tl-tm">${fd(o.abertura)} — ${esc(fn)}</div>
           </div>
         </div>
         ${(o.pecas||[]).length ? `
@@ -680,7 +707,7 @@ function renderPecas() {
         <tr style="border-top:1px solid var(--border-subtle)">
           <td style="padding:6px 8px">
             <input class="inp" style="padding:6px 10px;font-size:12px" type="text"
-              value="${p.nome}" placeholder="Nome da peça..."
+              value="${esc(p.nome)}" placeholder="Nome da peça..."
               oninput="pecasT[${i}].nome=this.value"
               aria-label="Nome da peça ${i+1}" />
           </td>
@@ -759,7 +786,16 @@ function toast(msg, type = 'ok') {
   const col = { ok:'var(--green)',      er:'var(--rose)',    wn:'var(--amber)' };
   const el  = document.createElement('div');
   el.className = `tmsg t-${type}`;
-  el.innerHTML = `<i class="bi bi-${ico[type]}" style="color:${col[type]};font-size:18px;flex-shrink:0" aria-hidden="true"></i>${msg}`;
+
+  const icon = document.createElement('i');
+  icon.className = `bi bi-${ico[type]}`;
+  icon.style.cssText = `color:${col[type]};font-size:18px;flex-shrink:0`;
+  icon.setAttribute('aria-hidden', 'true');
+
+  const text = document.createTextNode(msg);
+
+  el.appendChild(icon);
+  el.appendChild(text);
   document.getElementById('toastC').appendChild(el);
   setTimeout(() => {
     el.style.opacity    = '0';
@@ -787,7 +823,9 @@ function fc(v) {
 ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   init_user_display();
-  document.getElementById('oAb').value = new Date().toISOString().split('T')[0];
+  const hoje = new Date().toISOString().split('T')[0];
+  document.getElementById('oAb').value = hoje;
+  document.getElementById('oAb').max   = hoje;
   renderTbl();
 });
 /* ═══════════════════════════════════════════════

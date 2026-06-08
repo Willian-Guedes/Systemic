@@ -94,6 +94,28 @@ class AuthController
         }
     }
 
+    /*
+     * Verifica o token CSRF do POST contra o token da sessão.
+     * Encerra com 403 se o token estiver ausente, inválido ou a sessão não existir.
+     * Chame no início de todo handler POST que opera sobre sessão autenticada.
+     */
+    public static function validate_csrf_token(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $token_sessao = $_SESSION['csrf_token'] ?? '';
+        $token_post   = $_POST['csrf_token']    ?? '';
+
+        if (!$token_sessao || !hash_equals($token_sessao, $token_post)) {
+            http_response_code(403);
+            header('Content-Type: text/plain; charset=UTF-8');
+            echo 'Requisição inválida.';
+            exit;
+        }
+    }
+
     // ── Helpers privados ──────────────────────────────────────────────────
 
     private static function buscar_funcionario_por_email(string $email): ?array
@@ -112,7 +134,11 @@ class AuthController
     private static function iniciar_sessao_autenticada(array $funcionario): void
     {
         if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+            session_start([
+                'cookie_httponly' => true,
+                'cookie_secure'   => true,
+                'cookie_samesite' => 'Strict',
+            ]);
         }
 
         /*
@@ -124,7 +150,8 @@ class AuthController
         $_SESSION['funcionario_id']   = $funcionario['id_funcionario'];
         $_SESSION['funcionario_nome'] = $funcionario['nome_funcionario'];
         $_SESSION['nivel_de_acesso']  = $funcionario['nivel_de_acesso'];
-        $_SESSION['autenticado_em']   = time();
+        $_SESSION['autenticado_em']    = time();
+        $_SESSION['csrf_token']        = bin2hex(random_bytes(32));
     }
 
     private static function redirect_with_error(string $destino, string $mensagem): never

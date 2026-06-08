@@ -94,14 +94,17 @@ class CadastroController
             return;
         }
 
-        // ── Inserção do cliente ───────────────────────────────────────────
+        // ── Inserção atômica: cliente + veículo ───────────────────────────
         /*
-         * password_hash() com BCRYPT + custo 12 é o mesmo padrão usado
-         * pelo auth_controller.php, garantindo compatibilidade no login.
+         * Os dois INSERTs rodam dentro de uma transação para garantir que
+         * nunca exista um cliente sem veículo no banco. Se o INSERT do veículo
+         * falhar, o rollback desfaz o INSERT do cliente automaticamente.
          */
         $senha_hash = password_hash($senha, PASSWORD_BCRYPT, ['cost' => 12]);
 
         try {
+            $db->begin_transaction();
+
             $db->execute(
                 'INSERT INTO clientes (nome_cliente, CPF, celular, email, senha)
                  VALUES (:nome, :cpf, :celular, :email, :senha)',
@@ -116,20 +119,6 @@ class CadastroController
 
             $id_cliente = (int) $db->last_insert_id();
 
-        } catch (\PDOException $e) {
-            // Captura race-condition: dois cadastros com mesmo CPF/email simultâneos
-            if (self::is_duplicate_entry($e)) {
-                self::respond(409, 'CPF ou e-mail já cadastrado. Tente fazer login.');
-                return;
-            }
-
-            error_log('[CadastroController] Insert cliente error: ' . $e->getMessage());
-            self::respond(500, 'Erro ao criar a conta. Tente novamente.');
-            return;
-        }
-
-        // ── Inserção do veículo ───────────────────────────────────────────
-        try {
             $db->execute(
                 'INSERT INTO veiculos (marca, cor, ano, modelo, placa, id_cliente)
                  VALUES (:marca, :cor, :ano, :modelo, :placa, :id_cliente)',
@@ -143,15 +132,18 @@ class CadastroController
                 ]
             );
 
+            $db->commit();
+
         } catch (\PDOException $e) {
+            $db->rollback();
+
             if (self::is_duplicate_entry($e)) {
-                self::respond(409, 'Esta placa já está cadastrada no sistema.');
+                self::respond(409, 'CPF, e-mail ou placa já cadastrado. Tente fazer login.');
                 return;
             }
 
-            // Cliente foi criado mas veículo falhou — log é essencial aqui
-            error_log("[CadastroController] Insert veiculo error (cliente_id={$id_cliente}): " . $e->getMessage());
-            self::respond(500, 'Conta criada, mas houve um erro ao salvar o veículo. Entre em contato com a oficina.');
+            error_log('[CadastroController] Transaction error: ' . $e->getMessage());
+            self::respond(500, 'Erro ao criar a conta. Tente novamente.');
             return;
         }
 

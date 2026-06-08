@@ -20,6 +20,9 @@ function serve_page(string $base_href, string $file_path): void
 {
     http_response_code(200);
     header('Content-Type: text/html; charset=UTF-8');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'");
     echo '<base href="' . $base_href . '">';
     include $file_path;
 }
@@ -56,12 +59,16 @@ function serve_protected_page(string $base_href, string $file_path): void
         'nivel'      => $nivel,
         'iniciais'   => build_user_initials($_SESSION['funcionario_nome'] ?? ''),
         'permissoes' => AccessControl::permissoes_do_nivel($nivel),
+        'csrf_token' => $_SESSION['csrf_token'] ?? '',
     ];
 
     $safe_json = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
     http_response_code(200);
     header('Content-Type: text/html; charset=UTF-8');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'");
     echo '<base href="' . $base_href . '">';
     echo "<script>window.__session_user = {$safe_json};</script>";
     include $file_path;
@@ -107,10 +114,12 @@ $router->get('/auth/login', function () {
 });
 
 $router->post('/auth/login', function () {
+    AuthController::validate_csrf_token();
     AuthController::handle_login();
 });
 
 $router->post('/auth/logout', function () {
+    AuthController::validate_csrf_token();
     AuthController::handle_logout();
 });
 
@@ -120,8 +129,10 @@ $router->get('/produtos', function () {
     serve_protected_page('/pages/produto/', __DIR__ . '/pages/produto/produto.html');
 });
 
-$router->get('/produto/:id', function () {
+$router->get('/produto/:id', function (array $params) {
     serve_protected_page('/pages/produto/', __DIR__ . '/pages/produto/produto.html');
+    // O id é disponibilizado ao JS via window.location; registramos aqui para consistência futura.
+    // TODO: injetar window.__produto_id = $params['id'] quando o backend de produto estiver pronto.
 });
 
 $router->get('/ordem-servico', function () {
@@ -158,6 +169,7 @@ $router->get('/cadastro', function () {
 });
 
 $router->post('/cadastro/criar', function () {
+    AuthController::validate_csrf_token();
     CadastroController::handle_criar();
 });
 

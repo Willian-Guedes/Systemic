@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos — AUTO MAX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/produto.css">
+    <style>
+        .filtros-bar {
+            background-color: var(--carbon-mid);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 12px 0;
+            position: sticky;
+            top: 56px;
+            z-index: 100;
+        }
+
+        .btn-filtro {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-dim);
+            border-radius: 50px;
+            padding: 6px 20px;
+            font-size: 0.85rem;
+            font-family: var(--font-display);
+            letter-spacing: 0.04em;
+            transition: var(--transition);
+        }
+
+        .btn-filtro:hover,
+        .btn-filtro.ativo {
+            background-color: var(--red-vivid);
+            border-color: var(--red-vivid);
+            color: #fff;
+        }
+
+        .card-produto {
+            background-color: var(--carbon-light);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: var(--transition);
+            height: 100%;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-produto:hover {
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow-red);
+            transform: translateY(-4px);
+        }
+
+        .card-produto-img {
+            height: 200px;
+            object-fit: contain;
+            background-color: var(--carbon-mid);
+            padding: 16px;
+            width: 100%;
+        }
+
+        .card-produto-body {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-produto-nome {
+            color: var(--off-white);
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .card-produto-cat {
+            color: var(--text-dim);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .card-produto-preco {
+            color: var(--red-vivid);
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: auto;
+        }
+
+        .badge-sem-estoque {
+            background-color: var(--steel);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            letter-spacing: 0.04em;
+        }
+
+        #estado-loading,
+        #estado-vazio,
+        #estado-erro {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .paginacao .btn {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-dim);
+            border-radius: var(--radius-sm);
+            padding: 6px 14px;
+            transition: var(--transition);
+        }
+
+        .paginacao .btn:hover:not(:disabled),
+        .paginacao .btn.ativo {
+            background-color: var(--red-vivid);
+            border-color: var(--red-vivid);
+            color: #fff;
+        }
+
+        .paginacao .btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .total-info {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4" href="/">AUTO<span class="text-danger">MAX</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Início</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/produtos">Produtos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ordem-servico">Ordens</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="filtros-bar">
+        <div class="container d-flex gap-2 flex-wrap">
+            <button class="btn-filtro ativo" data-categoria="todos">Todos</button>
+            <button class="btn-filtro" data-categoria="pecas">Peças</button>
+            <button class="btn-filtro" data-categoria="fluidos">Fluidos</button>
+            <button class="btn-filtro" data-categoria="eletrico">Elétrico</button>
+        </div>
+    </div>
+
+    <div class="container py-5 mt-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 style="font-family: var(--font-display); color: var(--off-white); font-size: 2rem; letter-spacing: 0.04em;">
+                CATÁLOGO
+            </h2>
+            <span id="total-info" class="total-info"></span>
+        </div>
+
+        <div id="estado-loading" class="text-center py-5">
+            <div class="spinner-border text-danger" role="status" style="width:3rem;height:3rem;">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-3" style="color: var(--text-dim);">Carregando produtos...</p>
+        </div>
+
+        <div id="estado-erro" class="text-center py-5" hidden>
+            <i class="fas fa-exclamation-circle fa-3x mb-3" style="color: var(--red-vivid);"></i>
+            <h4 style="color: var(--off-white);">Erro ao carregar produtos</h4>
+            <p id="mensagem-erro" style="color: var(--text-dim);"></p>
+            <button class="btn btn-red mt-2" onclick="carregar_pagina(pagina_atual)">
+                <i class="fas fa-rotate-right me-2"></i> Tentar novamente
+            </button>
+        </div>
+
+        <div id="estado-vazio" class="text-center py-5" hidden>
+            <i class="fas fa-box-open fa-3x mb-3" style="color: var(--steel);"></i>
+            <h4 style="color: var(--off-white);">Nenhum produto encontrado</h4>
+            <p style="color: var(--text-dim);">Tente outro filtro de categoria.</p>
+        </div>
+
+        <div id="grid-produtos" class="row g-4" hidden></div>
+
+        <div id="paginacao" class="paginacao d-flex justify-content-center align-items-center gap-2 mt-5" hidden></div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/pages/produtos/produtos.js"></script>
+</body>
+</html>

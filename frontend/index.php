@@ -43,10 +43,6 @@ function build_user_initials(string $nome): string
  * Serve uma página protegida injetando os dados do usuário logado como
  * window.__session_user, para que o JS preencha o sidebar e aplique
  * as restrições de UI sem fazer uma segunda requisição ao servidor.
- *
- * O campo `permissoes` é um array de strings (ex: ['ordem_servico.visualizar']).
- * O JS usa can.editar para decidir o que mostrar — mas a proteção real
- * continua sendo feita pelo PHP em cada rota via AccessControl::exigir_permissao.
  */
 function serve_protected_page(string $base_href, string $file_path): void
 {
@@ -76,11 +72,6 @@ function serve_protected_page(string $base_href, string $file_path): void
 
 /*
  * Serve a página de login injetando o flash de erro da sessão, se houver.
- *
- * O login.html escuta window.__flash_error via JS. Usar json_encode() com
- * as flags HEX garante que qualquer caractere especial na mensagem não
- * quebre o contexto <script> — prevenindo XSS mesmo que a mensagem tenha
- * aspas, barras ou tags.
  */
 function serve_login_page(): void
 {
@@ -88,11 +79,6 @@ function serve_login_page(): void
         session_start();
     }
 
-    /*
-     * Garante que exista um token CSRF na sessão antes de servir o formulário.
-     * Sem isso, qualquer POST de login seria recusado com 403 porque
-     * validate_csrf_token() compararia o token do POST com uma string vazia.
-     */
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
@@ -138,13 +124,37 @@ $router->post('/auth/logout', function () {
 // ── Rotas protegidas (exigem sessão ativa) ────────────────────────────────
 
 $router->get('/produtos', function () {
-    serve_protected_page('/pages/produto/', __DIR__ . '/pages/produto/produto.html');
+    serve_protected_page('/pages/produtos/', __DIR__ . '/pages/produtos/produtos.html');
 });
 
 $router->get('/produto/:id', function (array $params) {
-    serve_protected_page('/pages/produto/', __DIR__ . '/pages/produto/produto.html');
-    // O id é disponibilizado ao JS via window.location; registramos aqui para consistência futura.
-    // TODO: injetar window.__produto_id = $params['id'] quando o backend de produto estiver pronto.
+    AuthController::exigir_autenticacao();
+
+    $id_produto = filter_var($params['id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id_produto === false) {
+        http_response_code(400);
+        header('Content-Type: text/html; charset=UTF-8');
+        echo '<p style="font-family:sans-serif;padding:2rem">ID de produto inválido.</p>';
+        return;
+    }
+
+    $safe_id   = json_encode($id_produto);
+    $safe_user = json_encode([
+        'nome'       => $_SESSION['funcionario_nome'] ?? '',
+        'nivel'      => $_SESSION['nivel_de_acesso']  ?? '',
+        'iniciais'   => build_user_initials($_SESSION['funcionario_nome'] ?? ''),
+        'permissoes' => AccessControl::permissoes_do_nivel($_SESSION['nivel_de_acesso'] ?? ''),
+        'csrf_token' => $_SESSION['csrf_token'] ?? '',
+    ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+
+    http_response_code(200);
+    header('Content-Type: text/html; charset=UTF-8');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'");
+    echo '<base href="/pages/produto/">';
+    echo "<script>window.__produto_id = {$safe_id}; window.__session_user = {$safe_user};</script>";
+    include __DIR__ . '/pages/produto/produto.html';
 });
 
 $router->get('/ordem-servico', function () {
@@ -164,17 +174,25 @@ $router->get('/ordem-servico', function () {
 //     serve_protected_page('/pages/estoque/', __DIR__ . '/pages/estoque/index.html');
 // });
 
-// ── Placeholders ──────────────────────────────────────────────────────────
- 
+// ── API de produtos ───────────────────────────────────────────────────────
+
 /*
  * GET /api/produto?id=:id
  * Retorna JSON com { produto, relacionados }.
- * O produto.js consome este endpoint ao carregar /produto/:id.
  */
 $router->get('/api/produto', function () {
     include __DIR__ . '/api/produto.php';
 });
-// ── Rotas de cadastro de cliente ─────────────────────────────────────────
+
+/*
+ * GET /api/produtos?pagina=:n&categoria=:cat
+ * Retorna JSON com { produtos, total, pagina, por_pagina, paginas }.
+ */
+$router->get('/api/produtos', function () {
+    include __DIR__ . '/api/produtos.php';
+});
+
+// ── Rotas de cadastro de cliente ──────────────────────────────────────────
 
 $router->get('/cadastro', function () {
     CadastroController::handle_page();
@@ -193,22 +211,10 @@ foreach (['/servicos', '/pedir'] as $rota) {
     });
 }
 
-/*
- * GET /busca?q=:termo&categoria=:cat&pagina=:n
- *
- * Página de resultados de busca pública (não exige login).
- * O JavaScript da página consome /api/busca para obter os dados.
- */
 $router->get('/busca', function () {
     serve_page('/pages/busca/', __DIR__ . '/pages/busca/busca.html');
 });
 
-/*
- * GET /api/busca?q=:termo&categoria=:cat&pagina=:n
- *
- * API JSON de busca de produtos — pública, sem autenticação.
- * Toda a sanitização e validação ocorre dentro do endpoint.
- */
 $router->get('/api/busca', function () {
     include __DIR__ . '/api/busca.php';
 });

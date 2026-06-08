@@ -97,3 +97,7 @@ Quando for construir uma página web do projeto, você precisa seguir a seguinte
 }
 ```
 Qualquer coisa peça pelo código html da página homepage para ver o design, mas peça o zip do projeto se necessário.
+
+
+Ao criar diretórios, não utilize {} em comandos como o mkdir, pois eles quebram.
+Exemplo: ``mkdir -p {algo}`` ou qualquer coisa com {} para representar multiplos diretórios

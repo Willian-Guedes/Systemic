@@ -3,9 +3,11 @@ services:
   web:
     build: .
     ports:
-      - "8080:80"
+      - "8080:80"    # Automax
+      - "8081:8081"  # Flowgate
     volumes:
-      - ./frontend:/var/www/html
+      - ./frontend:/var/www/html/automax
+      - ./flowgate:/var/www/html/flowgate
     depends_on:
       db:
         condition: service_healthy
@@ -14,6 +16,10 @@ services:
       DB_NAME: oficina_db
       DB_USER: automax
       DB_PASS: automax123
+      FG_DB_HOST: db
+      FG_DB_NAME: flowgate_db
+      FG_DB_USER: flowgate
+      FG_DB_PASS: flowgate123
 
   db:
     image: mariadb:10.11
@@ -27,6 +33,8 @@ services:
       - db_data:/var/lib/mysql
       - ./backend/Banco_de_Dados/oficina_db_mariadb.sql:/docker-entrypoint-initdb.d/01_schema.sql
       - ./backend/Banco_de_Dados/seed_funcionarios.sql:/docker-entrypoint-initdb.d/02_seed.sql
+      - ./backend/Banco_de_Dados/flowgate_init.sql:/docker-entrypoint-initdb.d/03_flowgate_user.sql
+      - ./flowgate/docs/flowgate_db.sql:/docker-entrypoint-initdb.d/04_flowgate_schema.sql
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s

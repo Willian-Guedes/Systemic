@@ -1,23 +1,26 @@
 <?php
-
 declare(strict_types=1);
+
+use Automax\Controllers\AuthController;
+use Automax\Config\Database;
+use Automax\Config\DatabaseException;
 
 /*
  * Endpoint: GET /api/produtos?pagina=:n&categoria=:cat
  *
- * Lista produtos com paginação e filtro opcional por categoria.
- * Exige autenticação (sessão ativa).
+ * Lista produtos com paginaÃ§Ã£o e filtro opcional por categoria.
+ * Exige autenticaÃ§Ã£o (sessÃ£o ativa).
  *
  * Respostas:
  *   200  { produtos: [...], total: int, pagina: int, por_pagina: int, paginas: int }
- *   401  { erro: "Não autenticado" }
- *   405  { erro: "Método não permitido" }
+ *   401  { erro: "NÃ£o autenticado" }
+ *   405  { erro: "MÃ©todo nÃ£o permitido" }
  *   500  { erro: "Erro interno" }
  */
 
-require_once __DIR__ . '/../database.php';
-require_once __DIR__ . '/../auth_controller.php';
-require_once __DIR__ . '/../ProdutoController.php';
+
+
+
 
 header('Content-Type: application/json; charset=UTF-8');
 header('X-Content-Type-Options: nosniff');
@@ -26,7 +29,7 @@ header('Cache-Control: no-store');
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     header('Allow: GET');
-    echo json_encode(['erro' => 'Método não permitido.']);
+    echo json_encode(['erro' => 'MÃ©todo nÃ£o permitido.']);
     exit;
 }
 

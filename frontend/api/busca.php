@@ -1,149 +1,108 @@
 <?php
-
 declare(strict_types=1);
 
+use Automax\Config\Database;
+use Automax\Config\DatabaseException;
+
+
+use Automax\Controllers\ProdutoNotFoundException;
+use Automax\Config\DatabaseException;
+
+
+use Automax\Config\Database;
+use Automax\Config\DatabaseException;
+
 /*
- * Endpoint público: GET /api/busca?q=:termo&categoria=:cat&pagina=:n
+ * Endpoint: GET /api/produtos?pagina=:n&categoria=:cat
  *
- * Busca produtos na tabela `produtos` sem exigir autenticação,
- * pois o resultado é exibido na página inicial (pré-login).
- *
- * Segurança:
- *  - Parâmetros sanitizados e validados antes de qualquer uso
- *  - Apenas prepared statements com parâmetros nomeados (zero SQL injection)
- *  - Paginação server-side (nenhum dado extra é exposto)
- *  - Cabeçalhos anti-clickjacking e anti-sniff incluídos
- *  - Campos retornados são explicitamente enumerados (sem SELECT *)
+ * Lista produtos com paginaÃ§Ã£o e filtro opcional por categoria.
+ * Exige autenticaÃ§Ã£o (sessÃ£o ativa).
  *
  * Respostas:
- *   200  { resultados: [...], total: int, pagina: int, por_pagina: int }
- *   400  { erro: "..." }
- *   405  { erro: "Método não permitido" }
+ *   200  { produtos: [...], total: int, pagina: int, por_pagina: int, paginas: int }
+ *   401  { erro: "NÃ£o autenticado" }
+ *   405  { erro: "MÃ©todo nÃ£o permitido" }
  *   500  { erro: "Erro interno" }
  */
 
-require_once __DIR__ . '/../database.php';
 
-// ── Cabeçalhos de segurança ────────────────────────────────────────────────
+
+
 
 header('Content-Type: application/json; charset=UTF-8');
 header('X-Content-Type-Options: nosniff');
-header('X-Frame-Options: DENY');
 header('Cache-Control: no-store');
-
-// ── Apenas GET ─────────────────────────────────────────────────────────────
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     header('Allow: GET');
-    echo json_encode(['erro' => 'Método não permitido.']);
+    echo json_encode(['erro' => 'MÃ©todo nÃ£o permitido.']);
     exit;
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+AuthController::exigir_autenticacao();
 
-function responder(int $codigo, array $payload): never
-{
-    http_response_code($codigo);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE);
-    exit;
-}
+$por_pagina = 12;
 
-// ── Validação e sanitização dos parâmetros ─────────────────────────────────
-
-// Termo de busca: strip tags, trim, limite de 100 chars
-$termo_raw = $_GET['q'] ?? '';
-$termo     = mb_substr(trim(strip_tags($termo_raw)), 0, 100, 'UTF-8');
-
-if ($termo === '') {
-    responder(400, ['erro' => 'Informe um termo de busca.']);
-}
-
-// Categoria: lista de valores permitidos (whitelist)
-$categorias_permitidas = ['pecas', 'fluidos', 'eletrico', 'todos'];
-$categoria_raw = strtolower(trim($_GET['categoria'] ?? 'todos'));
-$categoria     = in_array($categoria_raw, $categorias_permitidas, true)
-    ? $categoria_raw
-    : 'todos';
-
-// Paginação: página >= 1, por_pagina fixo em 12
-$pagina_raw = $_GET['pagina'] ?? '1';
-$pagina     = filter_var($pagina_raw, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+$pagina = filter_var($_GET['pagina'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 if ($pagina === false) {
     $pagina = 1;
 }
 
-$por_pagina = 12;
-$offset     = ($pagina - 1) * $por_pagina;
-
-// ── Monta query com prepared statements ───────────────────────────────────
-
-/*
- * Busca por LIKE nos campos nome e detalhes.
- * O % é adicionado aqui em PHP, nunca vindo do usuário direto,
- * para evitar qualquer possibilidade de injeção via parâmetro.
- */
-$like = '%' . $termo . '%';
-
-$params_count = [':like_nome' => $like, ':like_det' => $like];
-$params_rows  = [':like_nome' => $like, ':like_det' => $like];
-
-$where_categoria = '';
-if ($categoria !== 'todos') {
-    $where_categoria        = ' AND categoria = :categoria';
-    $params_count[':categoria'] = $categoria;
-    $params_rows[':categoria']  = $categoria;
-}
-
-$sql_count = "
-    SELECT COUNT(*) AS total
-      FROM produtos
-     WHERE (nome LIKE :like_nome OR detalhes LIKE :like_det)
-    {$where_categoria}
-";
-
-$sql_rows = "
-    SELECT id_produto, nome, preco, imagem, categoria, detalhes
-      FROM produtos
-     WHERE (nome LIKE :like_nome OR detalhes LIKE :like_det)
-    {$where_categoria}
-     ORDER BY nome ASC
-     LIMIT :limite OFFSET :offset
-";
-
-$params_rows[':limite']  = $por_pagina;
-$params_rows[':offset']  = $offset;
-
-// ── Executa ────────────────────────────────────────────────────────────────
+$categorias_permitidas = ['pecas', 'fluidos', 'eletrico', 'todos'];
+$categoria_raw = strtolower(trim($_GET['categoria'] ?? 'todos'));
+$categoria = in_array($categoria_raw, $categorias_permitidas, true) ? $categoria_raw : 'todos';
 
 try {
-    $db      = Database::get_instance();
-    $total   = (int) ($db->query_one($sql_count, $params_count)['total'] ?? 0);
-    $linhas  = $db->query($sql_rows, $params_rows);
+    $db     = Database::get_instance();
+    $offset = ($pagina - 1) * $por_pagina;
 
-    // Formata os dados: converte preço para float e garante tipos corretos
-    $resultados = array_map(function (array $row): array {
-        return [
-            'id'        => (int)   $row['id_produto'],
-            'nome'      =>         $row['nome'],
-            'preco'     => (float) $row['preco'],
-            'imagem'    =>         $row['imagem'],
-            'categoria' =>         $row['categoria'],
-            'detalhes'  =>         mb_substr($row['detalhes'], 0, 120, 'UTF-8'),
-        ];
-    }, $linhas);
+    $where_sql  = $categoria !== 'todos' ? 'WHERE categoria = :categoria' : '';
+    $params_base = $categoria !== 'todos' ? [':categoria' => $categoria] : [];
 
-    responder(200, [
-        'resultados' => $resultados,
+    $total = (int) ($db->query_one(
+        "SELECT COUNT(*) AS total FROM produtos {$where_sql}",
+        $params_base
+    )['total'] ?? 0);
+
+    $params_rows = array_merge($params_base, [
+        ':limite' => $por_pagina,
+        ':offset' => $offset,
+    ]);
+
+    $linhas = $db->query(
+        "SELECT id_produto, nome, preco, stock, imagem, categoria
+           FROM produtos
+         {$where_sql}
+          ORDER BY id_produto DESC
+          LIMIT :limite OFFSET :offset",
+        $params_rows
+    );
+
+    $produtos = array_map(fn(array $r): array => [
+        'id'        => (int)   $r['id_produto'],
+        'nome'      =>         $r['nome'],
+        'preco'     => (float) $r['preco'],
+        'stock'     => (int)   $r['stock'],
+        'imagem'    =>         $r['imagem'],
+        'categoria' =>         $r['categoria'],
+    ], $linhas);
+
+    http_response_code(200);
+    echo json_encode([
+        'produtos'   => $produtos,
         'total'      => $total,
         'pagina'     => $pagina,
         'por_pagina' => $por_pagina,
-    ]);
+        'paginas'    => (int) ceil($total / $por_pagina),
+    ], JSON_UNESCAPED_UNICODE);
 
 } catch (DatabaseException $e) {
-    error_log('[API busca] DatabaseException: ' . $e->getMessage());
-    responder(500, ['erro' => 'Erro interno. Tente novamente mais tarde.']);
+    error_log('[API produtos] DatabaseException: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['erro' => 'Erro interno. Tente novamente mais tarde.']);
 } catch (Throwable $e) {
-    error_log('[API busca] Throwable: ' . $e->getMessage());
-    responder(500, ['erro' => 'Erro interno inesperado.']);
+    error_log('[API produtos] Throwable: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['erro' => 'Erro interno inesperado.']);
 }

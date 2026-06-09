@@ -1,13 +1,13 @@
 {
     "name": "systemic/tests",
-    "description": "Testes unitários do backend Systemic (Automax)",
+    "description": "Testes unitarios do backend Systemic (Automax)",
     "require-dev": {
         "phpunit/phpunit": "^11.0"
     },
     "autoload": {
-        "classmap": [
-            "./frontend/"
-        ]
+        "psr-4": {
+            "Automax\\": "automax/app/"
+        }
     },
     "autoload-dev": {
         "psr-4": {

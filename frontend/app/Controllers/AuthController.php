@@ -87,7 +87,7 @@ class AuthController
         if (!$token_sessao || !hash_equals($token_sessao, $token_post)) {
             http_response_code(403);
             header('Content-Type: text/plain; charset=UTF-8');
-            echo 'RequisiÃ§Ã£o invÃ¡lida.';
+            echo 'Requisição inválida.';
             exit;
         }
     }
@@ -140,4 +140,3 @@ class AuthController
         exit;
     }
 }
-

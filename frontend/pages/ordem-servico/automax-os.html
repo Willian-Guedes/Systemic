@@ -69,7 +69,8 @@
 -->
   <!-- Footer -->
   <div class="sb-footer">
-    <form method="POST" action="/auth/logout">
+    <form method="POST" action="/auth/logout" id="formLogout">
+      <input type="hidden" name="csrf_token" id="csrfLogout" value="">
       <button type="submit" class="btn btn-outline" style="width:100%;justify-content:center" aria-label="Sair do sistema">
         <i class="bi bi-box-arrow-left" aria-hidden="true"></i>Sair
       </button>

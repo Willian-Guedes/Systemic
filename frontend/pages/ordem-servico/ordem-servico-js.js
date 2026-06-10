@@ -823,11 +823,18 @@ function fc(v) {
 ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   init_user_display();
+  inject_csrf_logout();
   const hoje = new Date().toISOString().split('T')[0];
   document.getElementById('oAb').value = hoje;
   document.getElementById('oAb').max   = hoje;
   renderTbl();
 });
+
+function inject_csrf_logout() {
+  const token = window.__session_user?.csrf_token ?? '';
+  const input = document.getElementById('csrfLogout');
+  if (input) input.value = token;
+}
 /* ═══════════════════════════════════════════════
    USUÁRIO DA SESSÃO
 ═══════════════════════════════════════════════ */

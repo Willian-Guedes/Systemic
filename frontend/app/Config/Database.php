@@ -65,6 +65,17 @@ class Database
         return $stmt->rowCount();
     }
 
+    public function query_all(string $sql, array $params = []): array
+    {
+        return $this->query($sql, $params);
+    }
+
+    public function insert(string $sql, array $params = []): int
+    {
+        $this->execute($sql, $params);
+        return (int) $this->connection->lastInsertId();
+    }
+
     public function last_insert_id(): string
     {
         return $this->connection->lastInsertId();
@@ -87,4 +98,3 @@ class Database
         }
     }
 }
-

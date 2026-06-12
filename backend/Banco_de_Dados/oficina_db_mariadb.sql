@@ -268,6 +268,28 @@ CREATE TABLE IF NOT EXISTS ordem_pecas (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
 
+
+CREATE TABLE IF NOT EXISTS agendamentos (
+    id             INT          NOT NULL AUTO_INCREMENT,
+    nome           VARCHAR(255) NOT NULL,
+    telefone       VARCHAR(30)  NOT NULL,
+    email          VARCHAR(255),
+    placa          VARCHAR(10),
+    marca          VARCHAR(100) NOT NULL,
+    modelo         VARCHAR(100) NOT NULL,
+    ano            SMALLINT,
+    combustivel    VARCHAR(30),
+    km             INT,
+    servico        VARCHAR(100) NOT NULL,
+    sintomas       VARCHAR(255),
+    descricao      TEXT,
+    data_preferida DATE         NOT NULL,
+    turno          VARCHAR(10),
+    status         VARCHAR(20)  NOT NULL DEFAULT 'pendente',
+    criado_em      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Reativa verificações de chave estrangeira
 SET FOREIGN_KEY_CHECKS = 1;
 

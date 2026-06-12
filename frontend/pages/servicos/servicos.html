@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Automax — Serviços especializados em Joinville/SC. Revisão, suspensão, freios, elétrica, ar-condicionado, alinhamento e diagnóstico computadorizado.">
+  <meta name="keywords" content="serviços mecânicos, revisão, suspensão, freios, elétrica, ar condicionado, alinhamento, balanceamento, diagnóstico, Joinville, Automax">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Automax Automotivas">
+  <meta property="og:title" content="Serviços — Automax Oficina Mecânica">
+  <meta property="og:description" content="Serviços automotivos especializados em Joinville/SC. Agende seu horário online.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="theme-color" content="#0D0E10">
+  <title>Serviços — Automax | Joinville/SC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles/servicos.css">
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
+  <nav class="site-navbar" id="mainNav" aria-label="Navegação principal">
+    <div class="container-xl">
+      <div class="navbar-inner">
+        <a class="navbar-brand-link" href="/" aria-label="Automax — Página inicial">
+          <span class="brand-auto">AUTO</span><span class="brand-max">MAX</span>
+        </a>
+
+        <ul class="navbar-nav-list d-none d-lg-flex" role="list">
+          <li><a href="/"          class="nav-link">Início</a></li>
+          <li><a href="/servicos"  class="nav-link active" aria-current="page">Serviços</a></li>
+          <li><a href="/produtos"  class="nav-link">Produtos</a></li>
+          <li><a href="/#sobre"    class="nav-link">Sobre</a></li>
+          <li><a href="https://wa.link/2ub6xt" class="nav-link" target="_blank" rel="noopener noreferrer">Contato</a></li>
+        </ul>
+
+        <div class="navbar-actions d-none d-md-flex">
+          <a href="/auth/login" class="btn-ghost-nav">Entrar</a>
+          <a href="/pedir"      class="btn-red-nav">Agendar</a>
+        </div>
+
+        <button class="mobile-toggle d-lg-none" id="mobileToggle"
+                aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+      <div class="container-xl">
+        <ul class="mobile-nav-list" role="list">
+          <li><a href="/"         class="mobile-nav-link">Início</a></li>
+          <li><a href="/servicos" class="mobile-nav-link">Serviços</a></li>
+          <li><a href="/produtos" class="mobile-nav-link">Produtos</a></li>
+          <li><a href="/#sobre"   class="mobile-nav-link">Sobre</a></li>
+          <li><a href="https://wa.link/2ub6xt" class="mobile-nav-link" target="_blank" rel="noopener noreferrer">Contato</a></li>
+        </ul>
+        <div class="mobile-actions">
+          <a href="/auth/login" class="btn-ghost-nav w-100 text-center">Entrar</a>
+          <a href="/pedir"      class="btn-red-nav w-100 text-center">Agendar</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+
+    <section class="page-hero" aria-labelledby="hero-heading">
+      <div class="container-xl">
+        <div class="row align-items-center g-4">
+          <div class="col-12 col-lg-7">
+            <div class="page-hero-eyebrow" aria-hidden="true">
+              <span class="eyebrow-dot"></span>
+              Oficina especializada
+            </div>
+            <h1 class="page-hero-title" id="hero-heading">
+              Serviços para<br>
+              <span class="accent">seu veículo</span>
+            </h1>
+            <p class="page-hero-sub">
+              Do diagnóstico à entrega, cada serviço é executado com equipamentos profissionais
+              e peças de qualidade. Equipe certificada, garantia em todos os serviços.
+            </p>
+            <div class="page-hero-actions">
+              <a href="/pedir" class="btn-primary">Agendar serviço</a>
+              <a href="https://wa.link/2ub6xt" class="btn-outline"
+                 target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
+            </div>
+          </div>
+          <div class="col-12 col-lg-5 d-none d-lg-flex justify-content-end">
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:flex-end;max-width:340px">
+              <div style="background:var(--carbon-light);border:1px solid var(--border-accent);border-radius:var(--radius-md);padding:1.25rem 1.5rem;text-align:center;min-width:140px">
+                <div style="font-family:var(--font-display);font-weight:900;font-size:2.2rem;color:var(--off-white);line-height:1">+5.000</div>
+                <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.25rem">Serviços realizados</div>
+              </div>
+              <div style="background:var(--carbon-light);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.25rem 1.5rem;text-align:center;min-width:140px">
+                <div style="font-family:var(--font-display);font-weight:900;font-size:2.2rem;color:var(--off-white);line-height:1">12</div>
+                <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.25rem">Especialidades</div>
+              </div>
+              <div style="background:var(--carbon-light);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.25rem 1.5rem;text-align:center;min-width:140px">
+                <div style="font-family:var(--font-display);font-weight:900;font-size:2.2rem;color:var(--off-white);line-height:1">90d</div>
+                <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.25rem">Garantia</div>
+              </div>
+              <div style="background:var(--carbon-light);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.25rem 1.5rem;text-align:center;min-width:140px">
+                <div style="font-family:var(--font-display);font-weight:900;font-size:2.2rem;color:var(--red-vivid);line-height:1">★ 4.9</div>
+                <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.25rem">Avaliação</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="guarantee-strip" role="list" aria-label="Diferenciais da Automax">
+      <div class="container-xl">
+        <div class="guarantee-grid">
+
+          <div class="guarantee-item" role="listitem">
+            <div class="guarantee-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div class="guarantee-text">
+              <strong>Garantia de 90 dias</strong>
+              <span>Em peças e mão de obra</span>
+            </div>
+          </div>
+
+          <div class="guarantee-item" role="listitem">
+            <div class="guarantee-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <div class="guarantee-text">
+              <strong>Diagnóstico digital</strong>
+              <span>Scanner OBD2 profissional</span>
+            </div>
+          </div>
+
+          <div class="guarantee-item" role="listitem">
+            <div class="guarantee-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="guarantee-text">
+              <strong>Prazo respeitado</strong>
+              <span>Entrega no horário combinado</span>
+            </div>
+          </div>
+
+          <div class="guarantee-item" role="listitem">
+            <div class="guarantee-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </div>
+            <div class="guarantee-text">
+              <strong>Peças originais</strong>
+              <span>Via catálogo Flowgate</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <section class="services-section" aria-labelledby="services-heading">
+      <div class="container-xl">
+        <div class="section-eyebrow" aria-hidden="true">
+          <span class="eyebrow-line"></span>
+          O que fazemos
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="section-title" id="services-heading">
+          Nossas <span class="text-red">especialidades</span>
+        </h2>
+        <p class="section-sub">
+          Todas as categorias de manutenção preventiva e corretiva para veículos de passeio e utilitários leves.
+        </p>
+
+        <div class="services-grid" role="list" aria-label="Lista de serviços">
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">01</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Revisão Geral</h3>
+            <p class="service-desc">
+              Troca de óleo, filtros de ar e combustível, verificação de fluidos, correia dentada e checagem completa dos sistemas do veículo.
+            </p>
+            <span class="service-price-tag">A partir de R$&nbsp;150</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar revisão geral">Agendar →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">02</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Suspensão &amp; Freios</h3>
+            <p class="service-desc">
+              Diagnóstico, reparo e substituição de amortecedores, molas, buchas, pastilhas, discos e fluido de freio.
+            </p>
+            <span class="service-price-tag">A partir de R$&nbsp;200</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar serviço de suspensão e freios">Agendar →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">03</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Sistema Elétrico</h3>
+            <p class="service-desc">
+              Diagnóstico de falhas elétricas, substituição de bateria, alternador, motor de partida, sensores e chicotes.
+            </p>
+            <span class="service-price-tag">Consulte valores</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar serviço elétrico">Agendar →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">04</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Ar Condicionado</h3>
+            <p class="service-desc">
+              Manutenção completa: recarga de gás, higienização do evaporador, troca de filtro e substituição de compressor.
+            </p>
+            <span class="service-price-tag">A partir de R$&nbsp;120</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar serviço de ar condicionado">Agendar →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">05</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Alinhamento &amp; Balanceamento</h3>
+            <p class="service-desc">
+              Equipamento computadorizado 3D para alinhamento de direção e balanceamento dinâmico de precisão.
+            </p>
+            <span class="service-price-tag">A partir de R$&nbsp;80</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar alinhamento e balanceamento">Agendar →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">06</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Diagnóstico Computadorizado</h3>
+            <p class="service-desc">
+              Scanner OBD2 profissional para leitura de falhas, mapeamento eletrônico e reset de módulos de controle.
+            </p>
+            <span class="service-price-tag">A partir de R$&nbsp;60</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar diagnóstico computadorizado">Agendar →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">07</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 3 21 3 21 8"/>
+                <line x1="4" y1="20" x2="21" y2="3"/>
+                <polyline points="21 16 21 21 16 21"/>
+                <line x1="15" y1="15" x2="21" y2="21"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Câmbio &amp; Transmissão</h3>
+            <p class="service-desc">
+              Troca de óleo do câmbio, revisão de caixa automática e manual, substituição de embreagem e rolamentos.
+            </p>
+            <span class="service-price-tag">Consulte valores</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar serviço de câmbio">Agendar →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">08</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Motor &amp; Injeção</h3>
+            <p class="service-desc">
+              Limpeza de bicos injetores, regulagem de motor, troca de velas, cabos e bobinas de ignição.
+            </p>
+            <span class="service-price-tag">A partir de R$&nbsp;180</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar serviço de motor e injeção">Agendar →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-number" aria-hidden="true">09</div>
+            <div class="service-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              </svg>
+            </div>
+            <h3 class="service-name">Direção &amp; Geometria</h3>
+            <p class="service-desc">
+              Correção de geometria, reparo de caixa de direção hidráulica e elétrica, substituição de terminais e pivôs.
+            </p>
+            <span class="service-price-tag">A partir de R$&nbsp;90</span>
+            <a href="/pedir" class="service-cta-link" aria-label="Agendar serviço de direção e geometria">Agendar →</a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="how-section" aria-labelledby="how-heading">
+      <div class="container-xl">
+        <div class="text-center mb-0">
+          <div class="section-eyebrow justify-content-center" aria-hidden="true">
+            <span class="eyebrow-line"></span>
+            Processo
+            <span class="eyebrow-line"></span>
+          </div>
+          <h2 class="section-title" id="how-heading">
+            Como <span class="text-red">funciona</span>
+          </h2>
+          <p class="section-sub mx-auto">
+            Transparência e organização do primeiro contato à entrega do veículo.
+          </p>
+        </div>
+
+        <ol class="steps-list" aria-label="Etapas do atendimento">
+          <li class="step-item">
+            <div class="step-number" aria-hidden="true">1</div>
+            <div class="step-content">
+              <h3 class="step-title">Agendamento</h3>
+              <p class="step-desc">Escolha o serviço e a data pelo formulário online ou WhatsApp.</p>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-number" aria-hidden="true">2</div>
+            <div class="step-content">
+              <h3 class="step-title">Diagnóstico</h3>
+              <p class="step-desc">Avaliação técnica com scanner e inspeção visual detalhada.</p>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-number" aria-hidden="true">3</div>
+            <div class="step-content">
+              <h3 class="step-title">Orçamento</h3>
+              <p class="step-desc">Receba o orçamento aprovado antes de qualquer execução.</p>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-number" aria-hidden="true">4</div>
+            <div class="step-content">
+              <h3 class="step-title">Execução</h3>
+              <p class="step-desc">Serviço realizado por técnicos certificados com peças de qualidade.</p>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-number" aria-hidden="true">5</div>
+            <div class="step-content">
+              <h3 class="step-title">Entrega</h3>
+              <p class="step-desc">Veículo entregue com relatório de serviço e garantia documentada.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="cta-section" aria-labelledby="cta-heading">
+      <div class="container-xl">
+        <div class="cta-inner">
+          <span class="cta-eyebrow" aria-hidden="true">Pronto para começar?</span>
+          <h2 class="cta-title" id="cta-heading">
+            Agende agora,<br>cuidamos do resto.
+          </h2>
+          <p class="cta-text">
+            Preencha o formulário de solicitação e nossa equipe entra em contato para confirmar horário e orçamento.
+          </p>
+          <div class="cta-btns">
+            <a href="/pedir" class="btn-light-cta">Solicitar agendamento</a>
+            <a href="https://wa.link/2ub6xt" class="btn-outline-white"
+               target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-top">
+      <div class="container-xl">
+        <div class="row g-4">
+          <div class="col-12 col-lg-4">
+            <a class="footer-brand" href="/" aria-label="Automax — ir para página inicial">
+              <span class="brand-auto">AUTO</span><span class="brand-max">MAX</span>
+            </a>
+            <p class="footer-about">Sua oficina e loja de auto peças de confiança em Joinville há mais de alguns meses</p>
+            <div class="footer-socials" role="list" aria-label="Redes sociais da Automax">
+              <a href="https://wa.link/2ub6xt" class="footer-social-btn" role="listitem"
+                 target="_blank" rel="noopener noreferrer" aria-label="WhatsApp da Automax">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                     viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </a>
+              <a href="#" class="footer-social-btn" role="listitem"
+                 aria-label="Instagram da Automax" target="_blank" rel="noopener noreferrer">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <h3 class="footer-heading">Navegação</h3>
+            <nav aria-label="Rodapé — links de navegação">
+              <ul class="footer-links" role="list">
+                <li><a href="/"         class="footer-link">Início</a></li>
+                <li><a href="/servicos" class="footer-link">Serviços</a></li>
+                <li><a href="/produtos" class="footer-link">Produtos</a></li>
+                <li><a href="/pedir"    class="footer-link">Agendar</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <h3 class="footer-heading">Conta</h3>
+            <nav aria-label="Rodapé — links de conta">
+              <ul class="footer-links" role="list">
+                <li><a href="/auth/login" class="footer-link">Entrar</a></li>
+                <li><a href="/cadastro"   class="footer-link">Cadastrar</a></li>
+                <li><a href="https://wa.link/2ub6xt" class="footer-link">Ajuda</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div class="col-12 col-md-4 col-lg-4">
+            <h3 class="footer-heading">Contato &amp; Horários</h3>
+            <address class="footer-address">
+              <p><strong>Tel:</strong> <a href="tel:+554733334444" class="footer-link">(47) 3333-4444</a></p>
+              <p><strong>Email:</strong> <a href="mailto:contato@automax.com.br" class="footer-link">contato@automax.com.br</a></p>
+              <p><strong>Endereço:</strong> Rua das Peças, 123 — Joinville/SC</p>
+              <p><strong>Seg–Sex:</strong> 8h – 18h &nbsp;|&nbsp; <strong>Sáb:</strong> 8h – 12h</p>
+            </address>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container-xl">
+        <div class="footer-bottom-inner">
+          <p class="footer-copy">© 2025 Automax Automotivas. Todos os direitos reservados.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const nav    = document.getElementById('mainNav');
+    const toggle = document.getElementById('mobileToggle');
+    const menu   = document.getElementById('mobileMenu');
+
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('nav-scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    toggle.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+      menu.setAttribute('aria-hidden', String(!open));
+    });
+  </script>
+</body>
+</html>

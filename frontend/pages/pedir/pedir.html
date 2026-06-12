@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Automax — Solicite um serviço ou agende uma visita à oficina em Joinville/SC. Preencha o formulário e entraremos em contato.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Automax Automotivas">
+  <meta property="og:title" content="Solicitar Serviço — Automax">
+  <meta property="og:description" content="Agende seu serviço ou solicite um orçamento na Automax em Joinville/SC.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="theme-color" content="#0D0E10">
+  <title>Solicitar Serviço — Automax | Joinville/SC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles/servicos.css">
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
+  <nav class="site-navbar" id="mainNav" aria-label="Navegação principal">
+    <div class="container-xl">
+      <div class="navbar-inner">
+        <a class="navbar-brand-link" href="/" aria-label="Automax — Página inicial">
+          <span class="brand-auto">AUTO</span><span class="brand-max">MAX</span>
+        </a>
+
+        <ul class="navbar-nav-list d-none d-lg-flex" role="list">
+          <li><a href="/"         class="nav-link">Início</a></li>
+          <li><a href="/servicos" class="nav-link">Serviços</a></li>
+          <li><a href="/produtos" class="nav-link">Produtos</a></li>
+          <li><a href="/#sobre"   class="nav-link">Sobre</a></li>
+          <li><a href="https://wa.link/2ub6xt" class="nav-link" target="_blank" rel="noopener noreferrer">Contato</a></li>
+        </ul>
+
+        <div class="navbar-actions d-none d-md-flex">
+          <a href="/auth/login" class="btn-ghost-nav">Entrar</a>
+          <a href="/pedir"      class="btn-red-nav active" aria-current="page">Agendar</a>
+        </div>
+
+        <button class="mobile-toggle d-lg-none" id="mobileToggle"
+                aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+      <div class="container-xl">
+        <ul class="mobile-nav-list" role="list">
+          <li><a href="/"         class="mobile-nav-link">Início</a></li>
+          <li><a href="/servicos" class="mobile-nav-link">Serviços</a></li>
+          <li><a href="/produtos" class="mobile-nav-link">Produtos</a></li>
+          <li><a href="/#sobre"   class="mobile-nav-link">Sobre</a></li>
+          <li><a href="https://wa.link/2ub6xt" class="mobile-nav-link" target="_blank" rel="noopener noreferrer">Contato</a></li>
+        </ul>
+        <div class="mobile-actions">
+          <a href="/auth/login" class="btn-ghost-nav w-100 text-center">Entrar</a>
+          <a href="/pedir"      class="btn-red-nav w-100 text-center">Agendar</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+
+    <section class="page-hero" aria-labelledby="hero-heading">
+      <div class="container-xl">
+        <div class="page-hero-eyebrow" aria-hidden="true">
+          <span class="eyebrow-dot"></span>
+          Atendimento rápido
+        </div>
+        <h1 class="page-hero-title" id="hero-heading">
+          Solicite um<br>
+          <span class="accent">serviço</span>
+        </h1>
+        <p class="page-hero-sub">
+          Preencha o formulário com os dados do seu veículo e o serviço desejado.
+          Nossa equipe entra em contato para confirmar horário e orçamento.
+        </p>
+      </div>
+    </section>
+
+    <section class="pedir-section" aria-labelledby="form-heading">
+      <div class="container-xl">
+        <div class="row g-4 g-lg-5">
+
+          <div class="col-12 col-lg-8">
+            <div class="form-card">
+              <h2 class="visually-hidden" id="form-heading">Formulário de solicitação de serviço</h2>
+
+              <p class="form-section-title">Seus dados</p>
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <div class="form-group">
+                    <label class="form-label" for="nome">
+                      Nome completo <span class="req" aria-hidden="true">*</span>
+                    </label>
+                    <input type="text" id="nome" name="nome" class="form-control"
+                           placeholder="Ex.: João da Silva" required autocomplete="name">
+                    <p class="form-error" id="nome-error">Por favor, informe seu nome.</p>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="form-group">
+                    <label class="form-label" for="telefone">
+                      Telefone / WhatsApp <span class="req" aria-hidden="true">*</span>
+                    </label>
+                    <input type="tel" id="telefone" name="telefone" class="form-control"
+                           placeholder="(47) 9 0000-0000" required autocomplete="tel"
+                           inputmode="numeric">
+                    <p class="form-error" id="telefone-error">Por favor, informe um telefone válido.</p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="form-label" for="email">E-mail</label>
+                    <input type="email" id="email" name="email" class="form-control"
+                           placeholder="voce@email.com" autocomplete="email">
+                    <p class="form-hint">Opcional — para envio do resumo da solicitação.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-divider" role="separator"></div>
+              <p class="form-section-title">Dados do veículo</p>
+
+              <div class="row g-3">
+                <div class="col-12 col-md-4">
+                  <div class="form-group">
+                    <label class="form-label" for="placa">Placa</label>
+                    <input type="text" id="placa" name="placa" class="form-control"
+                           placeholder="ABC-1D23" maxlength="8" autocomplete="off"
+                           style="text-transform:uppercase">
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="form-group">
+                    <label class="form-label" for="marca">
+                      Marca <span class="req" aria-hidden="true">*</span>
+                    </label>
+                    <select id="marca" name="marca" class="form-control" required>
+                      <option value="" disabled selected>Selecione</option>
+                      <option>Chevrolet</option>
+                      <option>Fiat</option>
+                      <option>Ford</option>
+                      <option>Honda</option>
+                      <option>Hyundai</option>
+                      <option>Jeep</option>
+                      <option>Nissan</option>
+                      <option>Renault</option>
+                      <option>Toyota</option>
+                      <option>Volkswagen</option>
+                      <option>Outra</option>
+                    </select>
+                    <p class="form-error" id="marca-error">Selecione a marca do veículo.</p>
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="form-group">
+                    <label class="form-label" for="modelo">
+                      Modelo <span class="req" aria-hidden="true">*</span>
+                    </label>
+                    <input type="text" id="modelo" name="modelo" class="form-control"
+                           placeholder="Ex.: Onix 1.0 Turbo" required>
+                    <p class="form-error" id="modelo-error">Informe o modelo do veículo.</p>
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="form-group">
+                    <label class="form-label" for="ano">Ano</label>
+                    <input type="number" id="ano" name="ano" class="form-control"
+                           placeholder="2020" min="1990" max="2026" inputmode="numeric">
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="form-group">
+                    <label class="form-label" for="combustivel">Combustível</label>
+                    <select id="combustivel" name="combustivel" class="form-control">
+                      <option value="" disabled selected>Selecione</option>
+                      <option>Flex</option>
+                      <option>Gasolina</option>
+                      <option>Etanol</option>
+                      <option>Diesel</option>
+                      <option>Elétrico</option>
+                      <option>Híbrido</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="form-group">
+                    <label class="form-label" for="km">Quilometragem</label>
+                    <input type="number" id="km" name="km" class="form-control"
+                           placeholder="Ex.: 85000" min="0" inputmode="numeric">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-divider" role="separator"></div>
+              <p class="form-section-title">Serviço solicitado</p>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="form-label" for="servico">
+                      Tipo de serviço <span class="req" aria-hidden="true">*</span>
+                    </label>
+                    <select id="servico" name="servico" class="form-control" required>
+                      <option value="" disabled selected>Selecione o serviço</option>
+                      <option>Revisão Geral</option>
+                      <option>Suspensão &amp; Freios</option>
+                      <option>Sistema Elétrico</option>
+                      <option>Ar Condicionado</option>
+                      <option>Alinhamento &amp; Balanceamento</option>
+                      <option>Diagnóstico Computadorizado</option>
+                      <option>Câmbio &amp; Transmissão</option>
+                      <option>Motor &amp; Injeção</option>
+                      <option>Direção &amp; Geometria</option>
+                      <option>Outro</option>
+                    </select>
+                    <p class="form-error" id="servico-error">Selecione o serviço desejado.</p>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="form-label">Sintomas / Observações</label>
+                    <div class="checkbox-group" role="group" aria-label="Sintomas observados">
+                      <label class="checkbox-option">
+                        <input type="checkbox" name="sintomas" value="barulho">
+                        <span>Barulho estranho</span>
+                      </label>
+                      <label class="checkbox-option">
+                        <input type="checkbox" name="sintomas" value="vibração">
+                        <span>Vibração</span>
+                      </label>
+                      <label class="checkbox-option">
+                        <input type="checkbox" name="sintomas" value="luz_painel">
+                        <span>Luz no painel</span>
+                      </label>
+                      <label class="checkbox-option">
+                        <input type="checkbox" name="sintomas" value="consumo">
+                        <span>Consumo alto</span>
+                      </label>
+                      <label class="checkbox-option">
+                        <input type="checkbox" name="sintomas" value="superaquecimento">
+                        <span>Superaquecimento</span>
+                      </label>
+                      <label class="checkbox-option">
+                        <input type="checkbox" name="sintomas" value="não_parte">
+                        <span>Não parte</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="form-label" for="descricao">Descreva o problema</label>
+                    <textarea id="descricao" name="descricao" class="form-control"
+                              placeholder="Descreva o que está acontecendo com seu veículo, quando o problema ocorre e há quanto tempo..."></textarea>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="form-group">
+                    <label class="form-label" for="data_preferida">
+                      Data preferida <span class="req" aria-hidden="true">*</span>
+                    </label>
+                    <input type="date" id="data_preferida" name="data_preferida"
+                           class="form-control" required>
+                    <p class="form-error" id="data-error">Selecione uma data.</p>
+                    <p class="form-hint">Seg–Sex, 8h–18h &nbsp;|&nbsp; Sáb, 8h–12h</p>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="form-group">
+                    <label class="form-label" for="turno">Turno</label>
+                    <select id="turno" name="turno" class="form-control">
+                      <option value="" disabled selected>Sem preferência</option>
+                      <option value="manha">Manhã (8h – 12h)</option>
+                      <option value="tarde">Tarde (13h – 17h)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-divider" role="separator"></div>
+
+              <div class="form-submit-row">
+                <p class="form-privacy-note">
+                  Seus dados são usados apenas para contato sobre este agendamento.
+                </p>
+                <button type="button" class="btn-submit" id="submitBtn"
+                        aria-describedby="form-success-msg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                  Enviar solicitação
+                </button>
+              </div>
+
+              <div class="form-success" id="form-success-msg" role="status" aria-live="polite">
+                ✓ Solicitação recebida! Nossa equipe entrará em contato em breve para confirmar o agendamento.
+              </div>
+            </div>
+          </div>
+
+          <aside class="col-12 col-lg-4" aria-label="Informações de contato">
+            <div class="contact-sidebar">
+
+              <a href="https://wa.link/2ub6xt" class="contact-card"
+                 target="_blank" rel="noopener noreferrer"
+                 aria-label="Falar no WhatsApp — (47) 9 0000-0000">
+                <div class="contact-card-icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                       fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                </div>
+                <div class="contact-card-body">
+                  <strong>WhatsApp</strong>
+                  <a href="https://wa.link/2ub6xt">(47) 9 0000-0000</a>
+                </div>
+              </a>
+
+              <div class="contact-card">
+                <div class="contact-card-icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="1.8"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </div>
+                <div class="contact-card-body">
+                  <strong>Telefone</strong>
+                  <a href="tel:+554733334444">(47) 3333-4444</a>
+                </div>
+              </div>
+
+              <div class="contact-card">
+                <div class="contact-card-icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="1.8"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </div>
+                <div class="contact-card-body">
+                  <strong>Endereço</strong>
+                  <p>Rua das Peças, 123<br>Joinville / SC</p>
+                </div>
+              </div>
+
+              <div class="contact-card">
+                <div class="contact-card-icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="1.8"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                </div>
+                <div class="contact-card-body">
+                  <strong>E-mail</strong>
+                  <a href="mailto:contato@automax.com.br">contato@automax.com.br</a>
+                </div>
+              </div>
+
+              <div class="horarios-card" aria-label="Horários de funcionamento">
+                <h3>Horários</h3>
+                <ul class="horarios-list">
+                  <li><span>Segunda – Sexta</span> <span>8h – 18h</span></li>
+                  <li><span>Sábado</span>           <span>8h – 12h</span></li>
+                  <li><span>Domingo</span>           <span>Fechado</span></li>
+                </ul>
+              </div>
+
+            </div>
+          </aside>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-top">
+      <div class="container-xl">
+        <div class="row g-4">
+          <div class="col-12 col-lg-4">
+            <a class="footer-brand" href="/" aria-label="Automax — ir para página inicial">
+              <span class="brand-auto">AUTO</span><span class="brand-max">MAX</span>
+            </a>
+            <p class="footer-about">Sua oficina e loja de auto peças de confiança em Joinville há mais de alguns meses</p>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <h3 class="footer-heading">Navegação</h3>
+            <nav aria-label="Rodapé — links de navegação">
+              <ul class="footer-links" role="list">
+                <li><a href="/"         class="footer-link">Início</a></li>
+                <li><a href="/servicos" class="footer-link">Serviços</a></li>
+                <li><a href="/produtos" class="footer-link">Produtos</a></li>
+                <li><a href="/pedir"    class="footer-link">Agendar</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <h3 class="footer-heading">Conta</h3>
+            <nav aria-label="Rodapé — links de conta">
+              <ul class="footer-links" role="list">
+                <li><a href="/auth/login" class="footer-link">Entrar</a></li>
+                <li><a href="/cadastro"   class="footer-link">Cadastrar</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div class="col-12 col-md-4 col-lg-4">
+            <h3 class="footer-heading">Contato &amp; Horários</h3>
+            <address class="footer-address">
+              <p><strong>Tel:</strong> <a href="tel:+554733334444" class="footer-link">(47) 3333-4444</a></p>
+              <p><strong>Email:</strong> <a href="mailto:contato@automax.com.br" class="footer-link">contato@automax.com.br</a></p>
+              <p><strong>Seg–Sex:</strong> 8h – 18h &nbsp;|&nbsp; <strong>Sáb:</strong> 8h – 12h</p>
+            </address>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container-xl">
+        <div class="footer-bottom-inner">
+          <p class="footer-copy">© 2025 Automax Automotivas. Todos os direitos reservados.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const nav    = document.getElementById('mainNav');
+    const toggle = document.getElementById('mobileToggle');
+    const menu   = document.getElementById('mobileMenu');
+
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('nav-scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    toggle.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+      menu.setAttribute('aria-hidden', String(!open));
+    });
+
+    /* Bloqueia datas passadas e domingos no input de data */
+    (function set_data_min() {
+      const input = document.getElementById('data_preferida');
+      const today = new Date();
+      const yyyy  = today.getFullYear();
+      const mm    = String(today.getMonth() + 1).padStart(2, '0');
+      const dd    = String(today.getDate()).padStart(2, '0');
+      input.min = `${yyyy}-${mm}-${dd}`;
+    })();
+
+    /* Formata placa em maiúsculo */
+    document.getElementById('placa').addEventListener('input', function () {
+      this.value = this.value.toUpperCase();
+    });
+
+    /* Validação e submit simulado */
+    document.getElementById('submitBtn').addEventListener('click', function () {
+      const required_fields = [
+        { id: 'nome',     error_id: 'nome-error'     },
+        { id: 'telefone', error_id: 'telefone-error' },
+        { id: 'marca',    error_id: 'marca-error'    },
+        { id: 'modelo',   error_id: 'modelo-error'   },
+        { id: 'servico',  error_id: 'servico-error'  },
+        { id: 'data_preferida', error_id: 'data-error' },
+      ];
+
+      let is_valid = true;
+
+      required_fields.forEach(function (field) {
+        const input = document.getElementById(field.id);
+        const error = document.getElementById(field.error_id);
+        if (!input.value.trim()) {
+          input.classList.add('is-invalid');
+          if (error) error.style.display = 'block';
+          is_valid = false;
+        } else {
+          input.classList.remove('is-invalid');
+          if (error) error.style.display = 'none';
+        }
+      });
+
+      if (!is_valid) return;
+
+      const btn = this;
+      btn.disabled = true;
+      btn.textContent = 'Enviando…';
+
+      const payload = {
+        nome:           document.getElementById('nome').value.trim(),
+        telefone:       document.getElementById('telefone').value.trim(),
+        email:          document.getElementById('email').value.trim(),
+        placa:          document.getElementById('placa').value.trim(),
+        marca:          document.getElementById('marca').value,
+        modelo:         document.getElementById('modelo').value.trim(),
+        ano:            document.getElementById('ano').value,
+        combustivel:    document.getElementById('combustivel').value,
+        km:             document.getElementById('km').value,
+        servico:        document.getElementById('servico').value,
+        sintomas:       Array.from(document.querySelectorAll('input[name="sintomas"]:checked')).map(c => c.value).join(', '),
+        descricao:      document.getElementById('descricao').value.trim(),
+        data_preferida: document.getElementById('data_preferida').value,
+        turno:          document.getElementById('turno').value,
+      };
+
+      fetch('/api/agendamento', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (json) {
+        if (json.ok) {
+          document.getElementById('form-success-msg').classList.add('visible');
+          btn.textContent = 'Enviado ✓';
+          window.scrollTo({ top: document.getElementById('form-success-msg').offsetTop - 100, behavior: 'smooth' });
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Enviar solicitação';
+          alert('Erro: ' + (json.erro || 'Tente novamente.'));
+        }
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Enviar solicitação';
+        alert('Falha na conexão. Tente novamente ou entre em contato pelo WhatsApp.');
+      });
+    });
+  </script>
+</body>
+</html>

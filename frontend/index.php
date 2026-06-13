@@ -10,6 +10,7 @@ use Automax\Controllers\AuthController;
 use Automax\Controllers\CadastroController;
 use Automax\Controllers\ProdutoController;
 use Automax\Controllers\FornecedorController;
+use Automax\Controllers\EstoqueController;
 use Automax\Controllers\ProdutoNotFoundException;
 use Automax\Config\DatabaseException;
 
@@ -154,6 +155,11 @@ $router->get('/fornecedores', function () {
     serve_protected_page('/pages/fornecedores/', __DIR__ . '/pages/fornecedores/fornecedores.html');
 });
 
+$router->get('/estoque', function () {
+    AccessControl::exigir_permissao('estoque.visualizar');
+    serve_protected_page('/pages/estoque/', __DIR__ . '/pages/estoque/estoque.html');
+});
+
 // API de produtos
 
 $router->get('/api/produto', function () {
@@ -162,6 +168,32 @@ $router->get('/api/produto', function () {
 
 $router->get('/api/produtos', function () {
     include __DIR__ . '/api/produtos.php';
+});
+
+// API de estoque (CRUD de produtos para gestão interna)
+
+$router->get('/api/estoque', function () {
+    EstoqueController::listar();
+});
+
+$router->post('/api/estoque', function () {
+    EstoqueController::criar();
+});
+
+$router->get('/api/estoque/:id', function (array $params) {
+    EstoqueController::buscar($params);
+});
+
+$router->put('/api/estoque/:id', function (array $params) {
+    EstoqueController::atualizar($params);
+});
+
+$router->patch('/api/estoque/:id/stock', function (array $params) {
+    EstoqueController::ajustar_stock($params);
+});
+
+$router->delete('/api/estoque/:id', function (array $params) {
+    EstoqueController::deletar($params);
 });
 
 // API de fornecedores

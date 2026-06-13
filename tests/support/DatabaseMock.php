@@ -83,5 +83,20 @@ class DatabaseMock extends Database
         $prop->setAccessible(true);
         $prop->setValue(null, $mock);
     }
+
+    public function begin_transaction(): void
+    {
+        $this->calls[] = ['method' => 'begin_transaction', 'sql' => null, 'params' => []];
+    }
+
+    public function commit(): void
+    {
+        $this->calls[] = ['method' => 'commit', 'sql' => null, 'params' => []];
+    }
+
+    public function rollback(): void
+    {
+        $this->calls[] = ['method' => 'rollback', 'sql' => null, 'params' => []];
+    }
 }
 

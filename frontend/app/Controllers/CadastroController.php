@@ -244,13 +244,13 @@ class CadastroController
 
     private static function read_json_body(): ?array
     {
-        $raw = file_get_contents('php://input');
+        $raw = $GLOBALS['_test_input'] ?? file_get_contents('php://input');
         if (empty($raw)) return null;
 
         $decoded = json_decode($raw, true);
         return is_array($decoded) ? $decoded : null;
     }
-
+    
     private static function is_duplicate_entry(\PDOException $e): bool
     {
         return str_starts_with($e->getCode(), '23');

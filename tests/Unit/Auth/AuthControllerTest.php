@@ -10,9 +10,11 @@ use Automax\Controllers\AuthController;
 class AuthControllerTest extends TestCase
 {
     private DatabaseMock $db;
+    private int $ob_level_before;
 
     protected function setUp(): void
     {
+        $this->ob_level_before = ob_get_level();
         $_POST    = [];
         $_SESSION = [];
         $this->db = DatabaseMock::setup();
@@ -24,7 +26,7 @@ class AuthControllerTest extends TestCase
         DatabaseMock::reset();
         $_POST    = [];
         $_SESSION = [];
-        while (ob_get_level() > 0) ob_end_clean();
+        while (ob_get_level() > $this->ob_level_before) ob_end_clean();
         if (session_status() === PHP_SESSION_ACTIVE) session_destroy();
     }
 
@@ -136,4 +138,3 @@ class AuthControllerTest extends TestCase
         $this->runLogout();
     }
 }
-

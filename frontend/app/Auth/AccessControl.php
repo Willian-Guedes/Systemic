@@ -22,6 +22,9 @@ class AccessControl
 
             'estoque.visualizar',
             'estoque.editar',
+
+            'funcionarios.visualizar',
+            'funcionarios.gerenciar',
         ],
 
         'recepcao' => [
@@ -31,6 +34,8 @@ class AccessControl
             'clientes.visualizar',
             'clientes.cadastrar',
             'clientes.editar',
+
+            'funcionarios.visualizar',
         ],
 
         'mecanico' => [

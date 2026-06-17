@@ -91,7 +91,7 @@ class AuthController
         }
 
         $token_sessao = $_SESSION['csrf_token'] ?? '';
-        $token_post   = $_POST['csrf_token']    ?? '';
+        $token_post   = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
 
         if (!$token_sessao || !hash_equals($token_sessao, $token_post)) {
             http_response_code(403);

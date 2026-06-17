@@ -11,9 +11,20 @@ class CadastroController
 {
     public static function handle_page(): void
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+
+        $safe_token = json_encode($_SESSION['csrf_token'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+
         http_response_code(200);
         header('Content-Type: text/html; charset=UTF-8');
         echo '<base href="/pages/cadastro/">';
+        echo "<script>window.__csrf_token = {$safe_token};</script>";
         include __DIR__ . '/../../pages/cadastro/cadastro.html';
     }
 
@@ -266,4 +277,3 @@ class CadastroController
         );
     }
 }
-

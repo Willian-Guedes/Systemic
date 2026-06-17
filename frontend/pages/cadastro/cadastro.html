@@ -1369,7 +1369,10 @@
             try {
                 const response = await fetch('/cadastro/criar', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': window.__csrf_token || '',
+                    },
                     body: JSON.stringify(payload),
                 });
 

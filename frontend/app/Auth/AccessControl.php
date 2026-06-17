@@ -22,9 +22,6 @@ class AccessControl
 
             'estoque.visualizar',
             'estoque.editar',
-
-            'funcionarios.visualizar',
-            'funcionarios.gerenciar',
         ],
 
         'recepcao' => [
@@ -34,8 +31,6 @@ class AccessControl
             'clientes.visualizar',
             'clientes.cadastrar',
             'clientes.editar',
-
-            'funcionarios.visualizar',
         ],
 
         'mecanico' => [
@@ -47,6 +42,16 @@ class AccessControl
             'estoque.visualizar',
             'estoque.editar',
         ],
+
+        'cliente' => [
+            'veiculos.visualizar',
+            'veiculos.cadastrar',
+            'veiculos.editar',
+            'veiculos.excluir',
+
+            'agendamentos.visualizar',
+            'agendamentos.criar',
+        ],
     ];
 
     public static function exigir_permissao(string $permissao): void
@@ -56,6 +61,22 @@ class AccessControl
         $nivel = $_SESSION['nivel_de_acesso'] ?? '';
 
         if (!self::nivel_tem_permissao($nivel, $permissao)) {
+            http_response_code(403);
+            header('Content-Type: text/html; charset=UTF-8');
+            include __DIR__ . '/../../pages/errors/403.html';
+            exit;
+        }
+    }
+
+    /**
+     * Garante que o usuário autenticado é um cliente (não um funcionário).
+     * Usado pelas rotas do painel do cliente (veículos, agendamentos).
+     */
+    public static function exigir_cliente(): void
+    {
+        AuthController::exigir_autenticacao();
+
+        if (($_SESSION['tipo_usuario'] ?? '') !== 'cliente') {
             http_response_code(403);
             header('Content-Type: text/html; charset=UTF-8');
             include __DIR__ . '/../../pages/errors/403.html';
@@ -74,4 +95,3 @@ class AccessControl
         return self::PERMISSIONS[$nivel] ?? [];
     }
 }
-

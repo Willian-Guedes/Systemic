@@ -15,12 +15,17 @@ const STATUS_LABELS = {
 document.addEventListener('DOMContentLoaded', function () {
     inject_csrf_logout();
     init_boas_vindas();
+    init_botao_voltar();
+    carregar_perfil();
     carregar_veiculos();
     carregar_agendamentos();
 
     document.getElementById('btnNovoVeiculo').addEventListener('click', abrir_modal_novo_veiculo);
     document.getElementById('btnSalvarVeiculo').addEventListener('click', salvar_veiculo);
     document.getElementById('btnConfirmarExcluir').addEventListener('click', confirmar_exclusao_veiculo);
+    document.getElementById('btnAlterarFoto').addEventListener('click', () => document.getElementById('inputFoto').click());
+    document.getElementById('inputFoto').addEventListener('change', enviar_foto_perfil);
+    document.getElementById('btnRemoverFoto').addEventListener('click', remover_foto_perfil);
 
     document.getElementById('veiculoPlaca').addEventListener('input', function () {
         this.value = this.value.toUpperCase();
@@ -82,6 +87,123 @@ function escape_html(texto) {
     const div = document.createElement('div');
     div.textContent = texto ?? '';
     return div.innerHTML;
+}
+
+/* ═══════════════════════════════════════════════
+   PERFIL
+═══════════════════════════════════════════════ */
+
+function iniciais_para_avatar(nome) {
+    const primeira = (nome || '').trim().charAt(0).toUpperCase();
+    return primeira || '?';
+}
+
+function url_avatar_placeholder(nome) {
+    const letra = encodeURIComponent(iniciais_para_avatar(nome));
+    return `https://placehold.co/256x256/272727/ffffff?text=${letra}`;
+}
+
+function init_botao_voltar() {
+    document.getElementById('btnVoltar').addEventListener('click', function () {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = '/';
+        }
+    });
+}
+
+async function carregar_perfil() {
+    try {
+        const resposta = await fetch('/api/perfil', { credentials: 'same-origin' });
+        if (!resposta.ok) throw new Error('Falha ao carregar perfil.');
+
+        const perfil = await resposta.json();
+        renderizar_perfil(perfil);
+    } catch (erro) {
+        mostrar_erro_perfil('Não foi possível carregar seu perfil.');
+    }
+}
+
+function renderizar_perfil(perfil) {
+    const avatar = document.getElementById('avatarPerfil');
+    avatar.src = perfil.foto_url || url_avatar_placeholder(perfil.nome);
+
+    document.getElementById('perfilNome').textContent  = perfil.nome  || '';
+    document.getElementById('perfilEmail').textContent = perfil.email || '';
+    document.getElementById('btnRemoverFoto').hidden = !perfil.foto_url;
+}
+
+function mostrar_erro_perfil(mensagem) {
+    const erro = document.getElementById('erroPerfil');
+    erro.textContent = mensagem;
+    erro.hidden = false;
+}
+
+function esconder_erro_perfil() {
+    document.getElementById('erroPerfil').hidden = true;
+}
+
+async function enviar_foto_perfil(evento) {
+    const arquivo = evento.target.files[0];
+    evento.target.value = '';
+    if (!arquivo) return;
+
+    esconder_erro_perfil();
+
+    const btn = document.getElementById('btnAlterarFoto');
+    btn.disabled = true;
+
+    const dados = new FormData();
+    dados.append('foto', arquivo);
+
+    try {
+        const resposta = await fetch('/api/perfil/foto', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'X-CSRF-Token': window.__session_user?.csrf_token ?? '' },
+            body: dados,
+        });
+
+        const json = await resposta.json();
+
+        if (!resposta.ok) {
+            mostrar_erro_perfil(json.erro || 'Não foi possível enviar a foto.');
+            return;
+        }
+
+        document.getElementById('avatarPerfil').src = json.foto_url;
+        document.getElementById('btnRemoverFoto').hidden = false;
+    } catch (erro) {
+        mostrar_erro_perfil('Falha na conexão. Tente novamente.');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function remover_foto_perfil() {
+    esconder_erro_perfil();
+
+    const btn = document.getElementById('btnRemoverFoto');
+    btn.disabled = true;
+
+    try {
+        const resposta = await fetch('/api/perfil/foto', {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: csrf_headers(),
+        });
+
+        if (!resposta.ok) throw new Error('Falha ao remover foto.');
+
+        const nome = document.getElementById('perfilNome').textContent;
+        document.getElementById('avatarPerfil').src = url_avatar_placeholder(nome);
+        btn.hidden = true;
+    } catch (erro) {
+        mostrar_erro_perfil('Não foi possível remover a foto. Tente novamente.');
+    } finally {
+        btn.disabled = false;
+    }
 }
 
 /* ═══════════════════════════════════════════════

@@ -28,6 +28,42 @@ function serve_page(string $base_href, string $file_path): void
     include $file_path;
 }
 
+function serve_page_with_optional_session(string $base_href, string $file_path): void
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start([
+            'cookie_httponly' => true,
+            'cookie_secure'   => true,
+            'cookie_samesite' => 'Strict',
+        ]);
+    }
+
+    http_response_code(200);
+    header('Content-Type: text/html; charset=UTF-8');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https://placehold.co; connect-src 'self' https://cdn.jsdelivr.net");
+
+    echo '<base href="' . $base_href . '">';
+
+    $autenticado = !empty($_SESSION['tipo_usuario']) && !empty($_SESSION['cliente_id']);
+
+    if ($autenticado) {
+        $user_data = [
+            'tipo'       => 'cliente',
+            'nome'       => $_SESSION['cliente_nome'] ?? '',
+            'iniciais'   => build_user_initials($_SESSION['cliente_nome'] ?? ''),
+            'csrf_token' => $_SESSION['csrf_token'] ?? '',
+        ];
+        $safe_json = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+        echo "<script>window.__session_user = {$safe_json};</script>";
+    } else {
+        echo "<script>window.__session_user = null;</script>";
+    }
+
+    include $file_path;
+}
+
 function build_user_initials(string $nome): string
 {
     $words = array_values(array_filter(explode(' ', $nome)));
@@ -105,7 +141,7 @@ function serve_login_page(): void
 // Rotas públicas
 
 $router->get('/', function () {
-    serve_page('/pages/homepage/', __DIR__ . '/pages/homepage/index.html');
+    serve_page_with_optional_session('/pages/homepage/', __DIR__ . '/pages/homepage/index.html');
 });
 
 $router->get('/auth/login', function () {
@@ -139,8 +175,8 @@ $router->get('/produto/:id', function (array $params) {
         return;
     }
 
-    $tipo = $_SESSION['tipo_usuario'] ?? 'funcionario';
-    $nome = $tipo === 'cliente' ? ($_SESSION['cliente_nome'] ?? '') : ($_SESSION['funcionario_nome'] ?? '');
+    $tipo  = $_SESSION['tipo_usuario'] ?? 'funcionario';
+    $nome  = $tipo === 'cliente' ? ($_SESSION['cliente_nome'] ?? '') : ($_SESSION['funcionario_nome'] ?? '');
     $nivel = $_SESSION['nivel_de_acesso'] ?? ($tipo === 'cliente' ? 'cliente' : '');
 
     $safe_id   = json_encode($id_produto);
@@ -256,6 +292,47 @@ $router->get('/api/agendamentos', function () {
 $router->post('/api/agendamento', function () {
     AccessControl::exigir_cliente();
     AgendamentoController::criar();
+});
+
+// API de perfil
+
+$router->get('/api/perfil', function () {
+    AccessControl::exigir_cliente();
+    ClienteController::perfil_get();
+});
+
+$router->post('/api/perfil/foto', function () {
+    AccessControl::exigir_cliente();
+    ClienteController::foto_upload();
+});
+
+$router->delete('/api/perfil/foto', function () {
+    AccessControl::exigir_cliente();
+    ClienteController::foto_remover();
+});
+
+// Servir avatares salvos em disco
+
+$router->get('/uploads/avatars/:arquivo', function (array $params) {
+    $nome = basename($params['arquivo'] ?? '');
+
+    if (!preg_match('/^\d+\.webp$/', $nome)) {
+        http_response_code(404);
+        exit;
+    }
+
+    $caminho = '/var/www/html/uploads/avatars/' . $nome;
+
+    if (!file_exists($caminho)) {
+        http_response_code(404);
+        exit;
+    }
+
+    header('Content-Type: image/webp');
+    header('Cache-Control: public, max-age=3600');
+    header('X-Content-Type-Options: nosniff');
+    readfile($caminho);
+    exit;
 });
 
 $router->get('/busca', function () {

@@ -8,14 +8,18 @@ use Automax\Config\Database;
 use Automax\Config\DatabaseException;
 
 /**
- * Área autenticada do cliente: gerenciamento dos próprios veículos
- * e consulta dos próprios agendamentos.
+ * Área autenticada do cliente: gerenciamento dos próprios veículos,
+ * consulta dos próprios agendamentos e gestão de foto de perfil.
  *
  * Todas as operações são restritas ao id_cliente da sessão — um cliente
  * nunca recebe ou altera dados de outro cliente.
  */
 class ClienteController
 {
+    private const AVATAR_DIR       = '/var/www/html/uploads/avatars/';
+    private const AVATAR_URL       = '/uploads/avatars/';
+    private const AVATAR_MAX_BYTES = 5_242_880; // 5 MB
+
     public static function listar_veiculos(): void
     {
         $id_cliente = self::id_cliente_sessao();
@@ -207,6 +211,139 @@ class ClienteController
         }
     }
 
+    public static function perfil_get(): void
+    {
+        $id_cliente = self::id_cliente_sessao();
+
+        try {
+            $db  = Database::get_instance();
+            $row = $db->query_one(
+                'SELECT nome_cliente, email, foto_perfil FROM clientes WHERE id_cliente = :id',
+                [':id' => $id_cliente]
+            );
+
+            if ($row === null) {
+                self::json(404, ['erro' => 'Cliente não encontrado.']);
+                return;
+            }
+
+            self::json(200, [
+                'nome'     => $row['nome_cliente'],
+                'email'    => $row['email'],
+                'foto_url' => $row['foto_perfil']
+                               ? self::AVATAR_URL . basename($row['foto_perfil'])
+                               : null,
+            ]);
+        } catch (DatabaseException $e) {
+            error_log('[ClienteController] perfil_get: ' . $e->getMessage());
+            self::json(503, ['erro' => 'Serviço indisponível.']);
+        }
+    }
+
+    public static function foto_upload(): void
+    {
+        self::validar_csrf();
+
+        $id_cliente = self::id_cliente_sessao();
+
+        if (empty($_FILES['foto'])) {
+            self::json(400, ['erro' => 'Arquivo não recebido.']);
+            return;
+        }
+
+        if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
+            $erro_upload = match ($_FILES['foto']['error']) {
+                UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'Arquivo muito grande. Máximo 5 MB.',
+                default => 'Falha no upload. Tente novamente.',
+            };
+            $status = $_FILES['foto']['error'] === UPLOAD_ERR_INI_SIZE
+                || $_FILES['foto']['error'] === UPLOAD_ERR_FORM_SIZE
+                ? 413
+                : 400;
+            self::json($status, ['erro' => $erro_upload]);
+            return;
+        }
+
+        $tmp  = $_FILES['foto']['tmp_name'];
+        $size = $_FILES['foto']['size'];
+
+        if ($size > self::AVATAR_MAX_BYTES) {
+            self::json(413, ['erro' => 'Arquivo muito grande. Máximo 5 MB.']);
+            return;
+        }
+
+        $mime             = mime_content_type($tmp);
+        $tipos_permitidos = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+        if (!in_array($mime, $tipos_permitidos, true)) {
+            self::json(415, ['erro' => 'Formato inválido. Use JPEG, PNG, WEBP ou GIF.']);
+            return;
+        }
+
+        $imagem_src = self::carregar_imagem_por_mime($tmp, $mime);
+
+        if ($imagem_src === null) {
+            self::json(422, ['erro' => 'Não foi possível processar a imagem.']);
+            return;
+        }
+
+        $imagem_final = self::redimensionar_para_quadrado($imagem_src, 256);
+        imagedestroy($imagem_src);
+
+        if (!is_dir(self::AVATAR_DIR)) {
+            mkdir(self::AVATAR_DIR, 0755, true);
+        }
+
+        $nome_arquivo = $id_cliente . '.webp';
+        $caminho      = self::AVATAR_DIR . $nome_arquivo;
+
+        if (!imagewebp($imagem_final, $caminho, 85)) {
+            imagedestroy($imagem_final);
+            self::json(500, ['erro' => 'Falha ao salvar a imagem.']);
+            return;
+        }
+
+        imagedestroy($imagem_final);
+
+        try {
+            $db = Database::get_instance();
+            $db->execute(
+                'UPDATE clientes SET foto_perfil = :foto WHERE id_cliente = :id',
+                [':foto' => $nome_arquivo, ':id' => $id_cliente]
+            );
+
+            self::json(200, ['foto_url' => self::AVATAR_URL . $nome_arquivo . '?v=' . time()]);
+        } catch (DatabaseException $e) {
+            error_log('[ClienteController] foto_upload: ' . $e->getMessage());
+            self::json(503, ['erro' => 'Serviço indisponível.']);
+        }
+    }
+
+    public static function foto_remover(): void
+    {
+        self::validar_csrf();
+
+        $id_cliente = self::id_cliente_sessao();
+
+        try {
+            $db = Database::get_instance();
+            $db->execute(
+                'UPDATE clientes SET foto_perfil = NULL WHERE id_cliente = :id',
+                [':id' => $id_cliente]
+            );
+
+            $caminho = self::AVATAR_DIR . $id_cliente . '.webp';
+            if (file_exists($caminho)) {
+                unlink($caminho);
+            }
+
+            self::json(200, ['ok' => true]);
+        } catch (DatabaseException $e) {
+            error_log('[ClienteController] foto_remover: ' . $e->getMessage());
+            self::json(503, ['erro' => 'Serviço indisponível.']);
+        }
+    }
+
     /**
      * @return array{0:string,1:string,2:string,3:string,4:string,5:string[]}
      *         [marca, modelo, ano, cor, placa, erros]
@@ -265,6 +402,32 @@ class ClienteController
             );
         }
         return $row !== null;
+    }
+
+    private static function carregar_imagem_por_mime(string $caminho, string $mime): \GdImage|null
+    {
+        return match ($mime) {
+            'image/jpeg' => imagecreatefromjpeg($caminho) ?: null,
+            'image/png'  => imagecreatefrompng($caminho)  ?: null,
+            'image/webp' => imagecreatefromwebp($caminho) ?: null,
+            'image/gif'  => imagecreatefromgif($caminho)  ?: null,
+            default      => null,
+        };
+    }
+
+    private static function redimensionar_para_quadrado(\GdImage $src, int $tamanho): \GdImage
+    {
+        $w    = imagesx($src);
+        $h    = imagesy($src);
+        $lado = min($w, $h);
+
+        $offset_x = (int) (($w - $lado) / 2);
+        $offset_y = (int) (($h - $lado) / 2);
+
+        $canvas = imagecreatetruecolor($tamanho, $tamanho);
+        imagecopyresampled($canvas, $src, 0, 0, $offset_x, $offset_y, $tamanho, $tamanho, $lado, $lado);
+
+        return $canvas;
     }
 
     private static function id_cliente_sessao(): int

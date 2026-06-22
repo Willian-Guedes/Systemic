@@ -17,7 +17,7 @@ class Database
         $name = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'oficina_db';
         $user = $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'automax';
         $pass = $_ENV['DB_PASS'] ?? getenv('DB_PASS')
-            ?: throw new \RuntimeException('VariÃ¡vel de ambiente DB_PASS nÃ£o configurada.');
+            ?: throw new \RuntimeException('Variável de ambiente DB_PASS não configurada.');
 
         $dsn = "mysql:host={$host};dbname={$name};charset=utf8mb4";
 
@@ -30,7 +30,7 @@ class Database
         try {
             $this->connection = new \PDO($dsn, $user, $pass, $options);
         } catch (\PDOException $e) {
-            throw new DatabaseException('NÃ£o foi possÃ­vel conectar ao banco de dados.', 0, $e);
+            throw new DatabaseException('Não foi possível conectar ao banco de dados.', 0, $e);
         }
     }
 

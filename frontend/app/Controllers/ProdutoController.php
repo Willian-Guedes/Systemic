@@ -28,7 +28,7 @@ class ProdutoController
         );
 
         if ($produto === null) {
-            throw new ProdutoNotFoundException("Produto #{$id_produto} nÃ£o encontrado.");
+            throw new ProdutoNotFoundException("Produto #{$id_produto} não encontrado.");
         }
 
         return $produto;
@@ -66,4 +66,3 @@ class ProdutoController
         );
     }
 }
-

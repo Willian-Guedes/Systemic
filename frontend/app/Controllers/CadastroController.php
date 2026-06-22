@@ -33,7 +33,7 @@ class CadastroController
         $body = self::read_json_body();
 
         if ($body === null) {
-            self::respond(400, 'Corpo da requisiÃ§Ã£o invÃ¡lido ou ausente.');
+            self::respond(400, 'Corpo da requisição inválido ou ausente.');
             return;
         }
 
@@ -65,22 +65,22 @@ class CadastroController
             $db = Database::get_instance();
         } catch (DatabaseException $e) {
             error_log('[CadastroController] DB connection error: ' . $e->getMessage());
-            self::respond(503, 'ServiÃ§o temporariamente indisponÃ­vel. Tente novamente em instantes.');
+            self::respond(503, 'Serviço temporariamente indisponível. Tente novamente em instantes.');
             return;
         }
 
         if (self::cpf_ja_cadastrado($db, $cpf)) {
-            self::respond(409, 'Este CPF jÃ¡ estÃ¡ cadastrado. Tente fazer login.');
+            self::respond(409, 'Este CPF já está cadastrado. Tente fazer login.');
             return;
         }
 
         if (self::email_ja_cadastrado($db, $email)) {
-            self::respond(409, 'Este e-mail jÃ¡ estÃ¡ em uso. Tente fazer login ou recuperar a senha.');
+            self::respond(409, 'Este e-mail já está em uso. Tente fazer login ou recuperar a senha.');
             return;
         }
 
         if (self::placa_ja_cadastrada($db, $placa)) {
-            self::respond(409, 'Esta placa jÃ¡ estÃ¡ cadastrada no sistema.');
+            self::respond(409, 'Esta placa já está cadastrada no sistema.');
             return;
         }
 
@@ -122,7 +122,7 @@ class CadastroController
             $db->rollback();
 
             if (self::is_duplicate_entry($e)) {
-                self::respond(409, 'CPF, e-mail ou placa jÃ¡ cadastrado. Tente fazer login.');
+                self::respond(409, 'CPF, e-mail ou placa já cadastrado. Tente fazer login.');
                 return;
             }
 
@@ -142,28 +142,28 @@ class CadastroController
 
         $nome = trim($data['nome_cliente'] ?? '');
         if (strlen($nome) < 3 || strlen($nome) > 255) {
-            $errors[] = 'Nome completo invÃ¡lido (3â€“255 caracteres).';
+            $errors[] = 'Nome completo inválido (3–255 caracteres).';
         }
 
         $cpf = preg_replace('/\D/', '', $data['cpf'] ?? '');
         if (!self::cpf_valido($cpf)) {
-            $errors[] = 'CPF invÃ¡lido.';
+            $errors[] = 'CPF inválido.';
         }
 
         $celular    = trim($data['celular'] ?? '');
         $cel_digits = preg_replace('/\D/', '', $celular);
         if (strlen($cel_digits) < 10 || strlen($cel_digits) > 11) {
-            $errors[] = 'NÃºmero de celular invÃ¡lido.';
+            $errors[] = 'Número de celular inválido.';
         }
 
         $email = trim($data['email'] ?? '');
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 255) {
-            $errors[] = 'E-mail invÃ¡lido.';
+            $errors[] = 'E-mail inválido.';
         }
 
         $senha = $data['senha'] ?? '';
         if (strlen($senha) < 8) {
-            $errors[] = 'A senha deve ter no mÃ­nimo 8 caracteres.';
+            $errors[] = 'A senha deve ter no mínimo 8 caracteres.';
         }
 
         return $errors;
@@ -175,27 +175,27 @@ class CadastroController
 
         $marca = trim($data['marca'] ?? '');
         if (strlen($marca) < 2 || strlen($marca) > 100) {
-            $errors[] = 'Marca do veÃ­culo invÃ¡lida.';
+            $errors[] = 'Marca do veículo inválida.';
         }
 
         $modelo = trim($data['modelo'] ?? '');
         if (strlen($modelo) < 2 || strlen($modelo) > 100) {
-            $errors[] = 'Modelo do veÃ­culo invÃ¡lido.';
+            $errors[] = 'Modelo do veículo inválido.';
         }
 
         $ano = trim($data['ano'] ?? '');
         if (!preg_match('/^(19|20)\d{2}(\/\d{2,4})?$/', $ano)) {
-            $errors[] = 'Ano do veÃ­culo invÃ¡lido.';
+            $errors[] = 'Ano do veículo inválido.';
         }
 
         $cor = trim($data['cor'] ?? '');
         if (strlen($cor) < 2 || strlen($cor) > 50) {
-            $errors[] = 'Cor do veÃ­culo invÃ¡lida.';
+            $errors[] = 'Cor do veículo inválida.';
         }
 
         $placa = strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $data['placa'] ?? ''));
         if (!self::placa_valida($placa)) {
-            $errors[] = 'Placa invÃ¡lida. Use o formato ABC-1234 ou ABC1D23.';
+            $errors[] = 'Placa inválida. Use o formato ABC-1234 ou ABC1D23.';
         }
 
         return $errors;

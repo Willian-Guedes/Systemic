@@ -16,7 +16,7 @@ use Automax\Config\DatabaseException;
  */
 class ClienteController
 {
-    private const AVATAR_DIR       = '/var/www/html/uploads/avatars/';
+    private const AVATAR_DIR       = '/var/www/html/automax/uploads/avatars/';
     private const AVATAR_URL       = '/uploads/avatars/';
     private const AVATAR_MAX_BYTES = 5_242_880; // 5 MB
 
@@ -228,11 +228,12 @@ class ClienteController
             }
 
             self::json(200, [
-                'nome'     => $row['nome_cliente'],
-                'email'    => $row['email'],
-                'foto_url' => $row['foto_perfil']
-                               ? self::AVATAR_URL . basename($row['foto_perfil'])
-                               : null,
+                'nome'       => $row['nome_cliente'],
+                'email'      => $row['email'],
+                'foto_url'   => $row['foto_perfil']
+                                 ? self::AVATAR_URL . basename($row['foto_perfil'])
+                                 : null,
+                'csrf_token' => $_SESSION['csrf_token'] ?? '',
             ]);
         } catch (DatabaseException $e) {
             error_log('[ClienteController] perfil_get: ' . $e->getMessage());

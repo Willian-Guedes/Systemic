@@ -58,4 +58,4 @@ function fecharCarrinho(valorProduto, quantidade, valorFrete, cupom = null, clie
 }
 
 /* A lógica de sessão da navbar vive em /navbar-session.js,
-   compartilhado com todas as páginas públicas. */
+   compartilhado com todas as páginas públicas.. */

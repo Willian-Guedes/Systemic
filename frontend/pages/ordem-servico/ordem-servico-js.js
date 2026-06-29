@@ -1,10 +1,4 @@
-/* ═══════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════ */
-/*
- * Objeto de permissões de UI — preenchido por build_ui_permissions() no init.
- * Não consultar window.__session_user diretamente fora dessa função.
- */
+/* STATE */
 let can = {
   visualizar:   false,
   criar:        false,
@@ -23,15 +17,7 @@ let srtD   = 'desc';
 let pg     = 1;
 const PG   = 8;
 
-/* ═══════════════════════════════════════════════
-   UTILS
-═══════════════════════════════════════════════ */
-/*
- * Escapa caracteres HTML especiais antes de interpolar em innerHTML.
- * Qualquer dado que venha do banco ou de input do usuário deve passar por aqui.
- * Usar textContent/setAttribute é preferível quando possível, mas dentro de
- * template literals de innerHTML esta função é a barreira contra XSS armazenado.
- */
+/* UTILS */
 function esc(str) {
   if (str == null) return '';
   return String(str)
@@ -41,10 +27,10 @@ function esc(str) {
     .replace(/"/g,  '&quot;')
     .replace(/'/g,  '&#39;');
 }
-/* ── Mapas de dados (preenchidos via API) ─────── */
-let veicMap  = {};   // { id_cliente: [{id, label}] }
-let funcMap  = {};   // { id_funcionario: 'Nome' }
-let cliMap   = {};   // { id_cliente: { nome, vip } }
+
+let veicMap  = {};
+let funcMap  = {};
+let cliMap   = {};
 
 const tipoLabel = {
   revisao:   'Revisão Geral',
@@ -69,19 +55,11 @@ const tipoBdg = {
   vip:       'b-purple',
 };
 
-/* ── Ordens (mock inicial) ──────────────────── */
-let ordens = [];   // preenchido por carregarDados()
-
+let ordens = [];
 let pecasT = [];
+let peca_timers = {};
 
-/* ═══════════════════════════════════════════════
-   PERFIL (ROLE SWITCH)
-═══════════════════════════════════════════════ */
-
-
-/* ═══════════════════════════════════════════════
-   VIEW (TABLE / KANBAN)
-═══════════════════════════════════════════════ */
+/* VIEW (TABLE / KANBAN) */
 function setView(v, btn) {
   view = v;
   document.querySelectorAll('.vb').forEach(b => b.classList.remove('active'));
@@ -91,9 +69,7 @@ function setView(v, btn) {
   if (v === 'kanban') renderKanban();
 }
 
-/* ═══════════════════════════════════════════════
-   FILTRO
-═══════════════════════════════════════════════ */
+/* FILTRO */
 function getFilt() {
   const q  = (document.getElementById('qInput').value || '').toLowerCase();
   const st = document.getElementById('fStat').value;
@@ -117,9 +93,7 @@ function srtBy(f, th) {
   filtrar();
 }
 
-/* ═══════════════════════════════════════════════
-   STATS
-═══════════════════════════════════════════════ */
+/* STATS */
 function updStats() {
   document.getElementById('sA').textContent  = ordens.filter(o => o.status === 'aberta').length;
   document.getElementById('sE').textContent  = ordens.filter(o => o.status === 'andamento').length;
@@ -131,9 +105,7 @@ function updStats() {
     ordens.filter(o => ['aberta','andamento','atrasada'].includes(o.status)).length;
 }
 
-/* ═══════════════════════════════════════════════
-   RENDERIZAR TABELA
-═══════════════════════════════════════════════ */
+/* RENDERIZAR TABELA */
 function renderTbl() {
   updStats();
 
@@ -248,9 +220,7 @@ function goP(p) {
   renderTbl();
 }
 
-/* ═══════════════════════════════════════════════
-   KANBAN
-═══════════════════════════════════════════════ */
+/* KANBAN */
 function renderKanban() {
   const data = getFilt();
   const cols = [
@@ -305,9 +275,7 @@ function renderKanban() {
   }).join('');
 }
 
-/* ═══════════════════════════════════════════════
-   MODAL NOVA OS
-═══════════════════════════════════════════════ */
+/* MODAL NOVA OS */
 function abrirNova() {
   editId = null; pecasT = [];
   document.getElementById('mTit').textContent    = 'Nova Ordem de Serviço';
@@ -331,9 +299,7 @@ function abrirNova() {
   new bootstrap.Modal(document.getElementById('mOS')).show();
 }
 
-/* ═══════════════════════════════════════════════
-   MODAL EDITAR OS
-═══════════════════════════════════════════════ */
+/* MODAL EDITAR OS */
 function editarOS(id) {
   const o = ordens.find(x => x.id_ordem === id);
   if (!o) return;
@@ -369,9 +335,7 @@ function editFromDet() {
   setTimeout(() => { if (editId) editarOS(editId); }, 300);
 }
 
-/* ═══════════════════════════════════════════════
-   SALVAR OS
-═══════════════════════════════════════════════ */
+/* SALVAR OS */
 async function salvarOS() {
   const fn = document.getElementById('oFunc').value;
   const cl = document.getElementById('oCli').value;
@@ -397,7 +361,6 @@ async function salvarOS() {
   }
   if (editId && pr < hoje) {
     showVali('Atenção: o prazo definido já está vencido. Salvo assim mesmo.');
-    // Não retorna — apenas avisa. O gestor pode precisar registrar retroativamente.
   }
   if (pr < ab) {
     showVali('O prazo previsto não pode ser anterior à data de abertura.'); return;
@@ -443,9 +406,7 @@ async function salvarOS() {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   FECHAR OS
-═══════════════════════════════════════════════ */
+/* FECHAR OS */
 async function fecharOS() {
   if (!editId) return;
   const mo = parseFloat(document.getElementById('oMO').value) || 0;
@@ -491,9 +452,7 @@ function showVali(msg) {
   el.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-/* ═══════════════════════════════════════════════
-   EXCLUIR
-═══════════════════════════════════════════════ */
+/* EXCLUIR */
 function askDel(id) {
   delId = id;
   document.getElementById('excNum').textContent = `#${String(id).padStart(4,'0')}`;
@@ -523,9 +482,7 @@ async function confirmDel() {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   DETALHE DA OS
-═══════════════════════════════════════════════ */
+/* DETALHE DA OS */
 function verDet(id) {
   const o = ordens.find(x => x.id_ordem === id);
   if (!o) return;
@@ -661,9 +618,7 @@ function verDet(id) {
   new bootstrap.Modal(document.getElementById('mDet')).show();
 }
 
-/* ═══════════════════════════════════════════════
-   PEÇAS (formulário)
-═══════════════════════════════════════════════ */
+/* PEÇAS (formulário) */
 function renderPecas() {
   const c = document.getElementById('pecasCont');
   if (!c) return;
@@ -685,11 +640,21 @@ function renderPecas() {
       <tbody>
         ${pecasT.map((p, i) => `
         <tr style="border-top:1px solid var(--border-subtle)">
-          <td style="padding:6px 8px">
+          <td style="padding:6px 8px;position:relative">
             <input class="inp" style="padding:6px 10px;font-size:12px" type="text"
-              value="${esc(p.nome)}" placeholder="Nome da peça..."
-              oninput="pecasT[${i}].nome=this.value"
+              id="peca-input-${i}"
+              value="${esc(p.nome)}" placeholder="Buscar no catálogo Flowgate…"
+              oninput="agendarBuscaPeca(${i}, this.value)"
+              onblur="fecharDropdown(${i})"
+              autocomplete="off"
               aria-label="Nome da peça ${i+1}" />
+            <ul id="peca-dropdown-${i}"
+                style="display:none;position:absolute;z-index:200;left:8px;right:8px;top:100%;
+                       background:var(--surface-panel);border:1px solid var(--border-mid);
+                       border-radius:6px;margin:2px 0 0;padding:4px 0;list-style:none;
+                       max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)"
+                role="listbox" aria-label="Sugestões da Flowgate">
+            </ul>
           </td>
           <td style="padding:6px 8px">
             <input class="inp" style="padding:6px 10px;font-size:12px;width:70px" type="number"
@@ -699,6 +664,7 @@ function renderPecas() {
           </td>
           <td style="padding:6px 8px">
             <input class="inp" style="padding:6px 10px;font-size:12px;width:110px" type="number"
+              id="peca-valor-${i}"
               value="${p.valor}" min="0" step="0.01"
               oninput="pecasT[${i}].valor=parseFloat(this.value)||0;calcOrc()"
               aria-label="Valor unitário da peça ${i+1}" />
@@ -717,19 +683,88 @@ function renderPecas() {
   calcOrc();
 }
 
-function addPeca()      { pecasT.push({ nome:'', qtd:1, valor:0 }); renderPecas(); }
-function removePeca(i)  { pecasT.splice(i, 1); renderPecas(); }
+function addPeca()     { pecasT.push({ nome:'', qtd:1, valor:0 }); renderPecas(); }
+function removePeca(i) { pecasT.splice(i, 1); renderPecas(); }
+
+function agendarBuscaPeca(indice, termo) {
+  pecasT[indice].nome = termo;
+
+  clearTimeout(peca_timers[indice]);
+
+  const dropdown = document.getElementById(`peca-dropdown-${indice}`);
+  if (!dropdown) return;
+
+  if (termo.trim().length < 2) {
+    fecharDropdown(indice);
+    return;
+  }
+
+  dropdown.innerHTML = '<li style="padding:8px 12px;font-size:12px;color:var(--text-faint)">Buscando…</li>';
+  dropdown.style.display = 'block';
+
+  peca_timers[indice] = setTimeout(() => buscarPecasFlowgate(indice, termo.trim()), 300);
+}
+
+async function buscarPecasFlowgate(indice, termo) {
+  const dropdown = document.getElementById(`peca-dropdown-${indice}`);
+  if (!dropdown) return;
+
+  try {
+    const res  = await fetch(`/api/flowgate/pecas?q=${encodeURIComponent(termo)}&por_pagina=8`);
+    const data = await res.json();
+
+    if (!res.ok || !data.pecas?.length) {
+      dropdown.innerHTML = '<li style="padding:8px 12px;font-size:12px;color:var(--text-faint)">Nenhuma peça encontrada.</li>';
+      dropdown.style.display = 'block';
+      return;
+    }
+
+    dropdown.innerHTML = data.pecas.map(p => `
+      <li role="option"
+          style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--border-subtle)"
+          onmousedown="selecionarPeca(${indice}, ${JSON.stringify(esc(p.nome))}, ${p.preco})"
+          title="${esc(p.sku)} · ${esc(p.fornecedora.nome)}">
+        <div style="font-weight:500;color:var(--text-primary)">${esc(p.nome)}</div>
+        <div style="color:var(--text-faint);font-size:11px;font-family:var(--font-mono)">
+          ${esc(p.sku)} · R$ ${p.preco.toFixed(2)} · ${esc(p.fornecedora.nome)}
+        </div>
+      </li>
+    `).join('');
+    dropdown.style.display = 'block';
+
+  } catch {
+    dropdown.innerHTML = '<li style="padding:8px 12px;font-size:12px;color:var(--rose)">Catálogo indisponível.</li>';
+    dropdown.style.display = 'block';
+  }
+}
+
+function selecionarPeca(indice, nome, preco) {
+  pecasT[indice].nome  = nome;
+  pecasT[indice].valor = preco;
+
+  const input = document.getElementById(`peca-input-${indice}`);
+  const valor = document.getElementById(`peca-valor-${indice}`);
+  if (input) input.value = nome;
+  if (valor) valor.value = preco.toFixed(2);
+
+  fecharDropdown(indice);
+  calcOrc();
+}
+
+function fecharDropdown(indice) {
+  clearTimeout(peca_timers[indice]);
+  const dropdown = document.getElementById(`peca-dropdown-${indice}`);
+  if (dropdown) dropdown.style.display = 'none';
+}
 
 function calcOrc() {
-  const tp  = pecasT.reduce((s, p) => s + (p.valor || 0) * (p.qtd || 1), 0);
-  const mo  = parseFloat(document.getElementById('oMO')?.value) || 0;
-  const el  = document.getElementById('oOrc');
+  const tp = pecasT.reduce((s, p) => s + (p.valor || 0) * (p.qtd || 1), 0);
+  const mo = parseFloat(document.getElementById('oMO')?.value) || 0;
+  const el = document.getElementById('oOrc');
   if (el) el.value = (tp + mo).toFixed(2);
 }
 
-/* ═══════════════════════════════════════════════
-   VEÍCULOS (select dependente)
-═══════════════════════════════════════════════ */
+/* VEÍCULOS (select dependente) */
 function popVeic(sel = null) {
   const ci = document.getElementById('oCli').value;
   const vs = veicMap[ci] || [];
@@ -740,9 +775,7 @@ function popVeic(sel = null) {
     : '<option value="">Selecione um cliente primeiro</option>';
 }
 
-/* ═══════════════════════════════════════════════
-   SIDEBAR (mobile)
-═══════════════════════════════════════════════ */
+/* SIDEBAR (mobile) */
 function toggleSidebar() {
   const sb  = document.getElementById('sidebar');
   const ov  = document.getElementById('overlay');
@@ -758,9 +791,7 @@ function closeSidebar() {
   document.querySelector('.sb-toggle')?.setAttribute('aria-expanded', 'false');
 }
 
-/* ═══════════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════════ */
+/* TOAST */
 function toast(msg, type = 'ok') {
   const ico = { ok:'check-circle-fill', er:'x-circle-fill', wn:'exclamation-triangle-fill' };
   const col = { ok:'var(--green)',      er:'var(--rose)',    wn:'var(--amber)' };
@@ -784,9 +815,7 @@ function toast(msg, type = 'ok') {
   }, 3500);
 }
 
-/* ═══════════════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════════════ */
+/* HELPERS */
 function fd(s) {
   if (!s) return '—';
   const [y, m, d] = s.split('-');
@@ -798,14 +827,7 @@ function fc(v) {
   return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(v);
 }
 
-/* ═══════════════════════════════════════════════
-   API HELPERS
-═══════════════════════════════════════════════ */
-
-/*
- * Wrapper para fetch com CSRF e JSON.
- * Todos os métodos de escrita precisam do token X-CSRF-TOKEN.
- */
+/* API HELPERS */
 function apiFetch(url, method = 'GET', body = null) {
   const csrf   = window.__session_user?.csrf_token ?? '';
   const opts   = {
@@ -816,10 +838,6 @@ function apiFetch(url, method = 'GET', body = null) {
   return fetch(url, opts);
 }
 
-/*
- * Carrega ordens E dados de suporte (clientes, funcionários, veículos).
- * Chamado uma vez no init.
- */
 async function carregarDados() {
   try {
     const [resSuportes, resOrdens] = await Promise.all([
@@ -830,19 +848,16 @@ async function carregarDados() {
     if (resSuportes.ok) {
       const suporte = await resSuportes.json();
 
-      // Monta funcMap: { '1': 'Jonas Pereira', ... }
       funcMap = {};
       for (const f of (suporte.funcionarios ?? [])) {
         funcMap[String(f.id)] = f.nome;
       }
 
-      // Monta cliMap: { '1': { nome: 'Fulano', vip: false }, ... }
       cliMap = {};
       for (const c of (suporte.clientes ?? [])) {
         cliMap[String(c.id)] = { nome: c.nome, vip: false };
       }
 
-      // veicMap já vem agrupado por id_cliente
       veicMap = suporte.veiculos_por_cliente ?? {};
 
       popSelects();
@@ -859,10 +874,6 @@ async function carregarDados() {
   }
 }
 
-/*
- * Popula os selects de funcionário e cliente do modal a partir dos mapas.
- * Chamado uma vez após carregarDados().
- */
 function popSelects() {
   const selFunc = document.getElementById('oFunc');
   const selCli  = document.getElementById('oCli');
@@ -878,9 +889,6 @@ function popSelects() {
       .join('');
 }
 
-/*
- * Recarrega apenas as ordens (usado após criar/editar/deletar).
- */
 async function carregarOrdens() {
   try {
     const res = await apiFetch('/api/ordens');
@@ -893,9 +901,7 @@ async function carregarOrdens() {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════════ */
+/* INIT */
 document.addEventListener('DOMContentLoaded', async () => {
   init_user_display();
   inject_csrf_logout();
@@ -911,22 +917,14 @@ function inject_csrf_logout() {
   const input = document.getElementById('csrfLogout');
   if (input) input.value = token;
 }
-/* ═══════════════════════════════════════════════
-   USUÁRIO DA SESSÃO
-═══════════════════════════════════════════════ */
 
+/* USUÁRIO DA SESSÃO */
 const nivel_para_estilo = {
   gerente:  { av: 'av-gerente',  pb: 'pb-gerente',  label: 'Gerente' },
   recepcao: { av: 'av-recepcao', pb: 'pb-recepcao', label: 'Recepcionista' },
   mecanico: { av: 'av-mecanico', pb: 'pb-mecanico', label: 'Mecânico' },
 };
 
-/*
- * Lê window.__session_user.permissoes (injetado pelo PHP) e preenche o
- * objeto global `can` com booleanos prontos para uso no resto do JS.
- * Um único ponto de manutenção: se uma permissão mudar de nome no PHP,
- * só este mapeamento precisa ser atualizado.
- */
 function build_ui_permissions() {
   const permissoes = window.__session_user?.permissoes ?? [];
   const has = (p) => permissoes.includes(p);
@@ -940,10 +938,6 @@ function build_ui_permissions() {
   can.ver_estoque  = has('estoque.visualizar');
 }
 
-/*
- * Aplica as permissões à UI: mostra ou oculta elementos conforme o usuário.
- * JS é camada de UX — a proteção real é o PHP que não serve a rota.
- */
 function apply_ui_permissions() {
   const show = (id, visible) => {
     const el = document.getElementById(id);

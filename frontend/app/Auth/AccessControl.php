@@ -25,6 +25,8 @@ class AccessControl
 
             'funcionarios.visualizar',
             'funcionarios.gerenciar',
+
+            'logs.visualizar',
         ],
 
         'recepcao' => [

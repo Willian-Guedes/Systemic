@@ -1,33 +1,21 @@
-/**
- * estoque.js
- *
- * Responsabilidades:
- *  1. Listar produtos com busca, filtro de categoria e paginação
- *  2. Criar e editar produtos via modal
- *  3. Ajustar estoque com botões +/-
- *  4. Remover produto com confirmação
- */
-
-const user       = window.__session_user || {};
-const csrf       = user.csrf_token || '';
+const user        = window.__session_user || {};
+const csrf        = user.csrf_token || '';
 const pode_editar = (user.permissoes || []).includes('estoque.editar');
 
-let pagina_atual   = 1;
-let total_paginas  = 1;
+let pagina_atual    = 1;
+let total_paginas   = 1;
 let categoria_atual = '';
-let busca_atual    = '';
-let timeout_busca  = null;
-let id_excluindo   = null;
+let busca_atual     = '';
+let timeout_busca   = null;
+let id_excluindo    = null;
 
 let modalProd, modalExc;
-
-// Setup sidebar (igual ao fornecedores.html)
 
 function setupSidebar() {
     const av = document.getElementById('sbAv');
     av.textContent = user.iniciais || '?';
     av.className   = 'av av-' + (user.nivel || '');
-    document.getElementById('sbName').textContent = user.nome  || '';
+    document.getElementById('sbName').textContent = user.nome || '';
     const role = document.getElementById('sbRole');
     role.textContent = user.nivel || '';
     role.className   = 'pbadge pb-' + (user.nivel || '');
@@ -43,8 +31,8 @@ function setupSidebar() {
 }
 
 function toggleSidebar() {
-    const sb = document.getElementById('sidebar');
-    const ov = document.getElementById('overlay');
+    const sb   = document.getElementById('sidebar');
+    const ov   = document.getElementById('overlay');
     const open = sb.classList.toggle('open');
     ov.classList.toggle('show', open);
 }
@@ -54,11 +42,9 @@ function closeSidebar() {
     document.getElementById('overlay').classList.remove('show');
 }
 
-// Toast (igual ao fornecedores.html)
-
 function toast(msg, tipo = 'ok') {
-    const c = document.getElementById('toastC');
-    const t = document.createElement('div');
+    const c    = document.getElementById('toastC');
+    const t    = document.createElement('div');
     t.className = 'tmsg t-' + (tipo === 'ok' ? 'ok' : tipo === 'erro' ? 'er' : 'wn');
     const icon = tipo === 'ok' ? 'check-circle-fill' : tipo === 'erro' ? 'x-circle-fill' : 'exclamation-triangle-fill';
     const cor  = tipo === 'ok' ? 'var(--green)' : tipo === 'erro' ? 'var(--rose)' : 'var(--amber)';
@@ -87,22 +73,16 @@ function label_cat(cat) {
     return { pecas: 'Peças', fluidos: 'Fluidos', eletrico: 'Elétrico' }[cat] ?? cat;
 }
 
-// Carregamento
-
 async function carregarEstoque(pagina = 1) {
     pagina_atual = pagina;
-
     const params = new URLSearchParams({ pagina, categoria: categoria_atual, busca: busca_atual });
 
     try {
         const res   = await fetch(`/api/estoque?${params}`, { credentials: 'same-origin' });
         const dados = await res.json();
-
         if (!res.ok) throw new Error(dados.erro || 'Erro desconhecido');
-
         renderTabela(dados.produtos, dados.total);
         renderPaginacao(dados.pagina, dados.paginas);
-
     } catch (err) {
         document.getElementById('tbodyEstoque').innerHTML = `
             <tr><td colspan="6">
@@ -174,16 +154,15 @@ function renderTabela(produtos, total) {
 }
 
 function renderPaginacao(pagina, total) {
-    total_paginas = total;
+    total_paginas   = total;
     const container = document.getElementById('paginacao');
     container.innerHTML = '';
-
     if (total <= 1) return;
 
     const btn_ant = document.createElement('button');
-    btn_ant.className   = 'btn btn-ghost btn-sm';
-    btn_ant.innerHTML   = '<i class="bi bi-chevron-left"></i>';
-    btn_ant.disabled    = pagina <= 1;
+    btn_ant.className = 'btn btn-ghost btn-sm';
+    btn_ant.innerHTML = '<i class="bi bi-chevron-left"></i>';
+    btn_ant.disabled  = pagina <= 1;
     btn_ant.addEventListener('click', () => carregarEstoque(pagina - 1));
     container.appendChild(btn_ant);
 
@@ -193,14 +172,12 @@ function renderPaginacao(pagina, total) {
     container.appendChild(info);
 
     const btn_prox = document.createElement('button');
-    btn_prox.className  = 'btn btn-ghost btn-sm';
-    btn_prox.innerHTML  = '<i class="bi bi-chevron-right"></i>';
-    btn_prox.disabled   = pagina >= total;
+    btn_prox.className = 'btn btn-ghost btn-sm';
+    btn_prox.innerHTML = '<i class="bi bi-chevron-right"></i>';
+    btn_prox.disabled  = pagina >= total;
     btn_prox.addEventListener('click', () => carregarEstoque(pagina + 1));
     container.appendChild(btn_prox);
 }
-
-// Ajuste rápido de stock
 
 async function ajustarStock(id_produto, delta) {
     try {
@@ -211,7 +188,6 @@ async function ajustarStock(id_produto, delta) {
             body:        JSON.stringify({ delta }),
         });
         const dados = await res.json();
-
         if (!res.ok) { toast(dados.erro || 'Erro ao ajustar estoque.', 'erro'); return; }
 
         const span = document.getElementById(`stock-${id_produto}`);
@@ -219,45 +195,61 @@ async function ajustarStock(id_produto, delta) {
             span.textContent = dados.stock;
             span.className   = classe_stock(dados.stock);
         }
-
     } catch {
         toast('Falha de conexão ao ajustar estoque.', 'erro');
     }
 }
 
-// Modal criar / editar
+function mostrar_preview(src) {
+    const preview       = document.getElementById('previewImagem');
+    preview.src         = src;
+    preview.style.display = '';
+}
+
+function esconder_preview() {
+    const preview       = document.getElementById('previewImagem');
+    preview.src         = '';
+    preview.style.display = 'none';
+}
+
+function resetarModal() {
+    document.getElementById('produtoId').value      = '';
+    document.getElementById('inputNome').value      = '';
+    document.getElementById('inputCategoria').value = '';
+    document.getElementById('inputPreco').value     = '';
+    document.getElementById('inputStock').value     = '0';
+    document.getElementById('inputDetalhes').value  = '';
+    document.getElementById('imagemUrl').value      = '';
+    document.getElementById('inputImagem').value    = '';
+    document.getElementById('vMsg').classList.remove('show');
+    esconder_preview();
+}
 
 function abrirNovo() {
-    document.getElementById('mTit').textContent    = 'Novo Produto';
-    document.getElementById('produtoId').value     = '';
-    document.getElementById('inputNome').value     = '';
-    document.getElementById('inputCategoria').value = '';
-    document.getElementById('inputPreco').value    = '';
-    document.getElementById('inputStock').value    = '0';
-    document.getElementById('inputImagem').value   = '';
-    document.getElementById('inputDetalhes').value = '';
-    document.getElementById('vMsg').classList.remove('show');
+    document.getElementById('mTit').textContent = 'Novo Produto';
+    resetarModal();
     modalProd.show();
 }
 
 async function abrirEdicao(id_produto) {
     document.getElementById('mTit').textContent = 'Editar Produto';
-    document.getElementById('produtoId').value  = id_produto;
-    document.getElementById('vMsg').classList.remove('show');
+    resetarModal();
+    document.getElementById('produtoId').value = id_produto;
     modalProd.show();
 
     try {
         const res   = await fetch(`/api/estoque/${id_produto}`, { credentials: 'same-origin' });
         const dados = await res.json();
-
         if (!res.ok) throw new Error(dados.erro || 'Erro ao carregar produto.');
 
         document.getElementById('inputNome').value      = dados.nome      ?? '';
         document.getElementById('inputCategoria').value = dados.categoria  ?? '';
         document.getElementById('inputPreco').value     = dados.preco      ?? '';
         document.getElementById('inputStock').value     = dados.stock      ?? '0';
-        document.getElementById('inputImagem').value    = dados.imagem     ?? '';
         document.getElementById('inputDetalhes').value  = dados.detalhes   ?? '';
+        document.getElementById('imagemUrl').value      = dados.imagem     ?? '';
+
+        if (dados.imagem) mostrar_preview(dados.imagem);
 
     } catch (err) {
         document.getElementById('vTxt').textContent = err.message;
@@ -265,21 +257,50 @@ async function abrirEdicao(id_produto) {
     }
 }
 
+async function fazer_upload_imagem(arquivo) {
+    const form_data = new FormData();
+    form_data.append('imagem', arquivo);
+
+    const res   = await fetch('/api/estoque/imagem', {
+        method:      'POST',
+        credentials: 'same-origin',
+        headers:     { 'X-CSRF-Token': csrf },
+        body:        form_data,
+    });
+    const dados = await res.json();
+    if (!res.ok) throw new Error(dados.erro || 'Falha no upload da imagem.');
+    return dados.imagem_url;
+}
+
 async function salvarProduto() {
     const id      = document.getElementById('produtoId').value;
-    const payload = {
-        nome:      document.getElementById('inputNome').value.trim(),
-        categoria: document.getElementById('inputCategoria').value,
-        preco:     parseFloat(document.getElementById('inputPreco').value),
-        stock:     parseInt(document.getElementById('inputStock').value, 10),
-        imagem:    document.getElementById('inputImagem').value.trim(),
-        detalhes:  document.getElementById('inputDetalhes').value.trim(),
-    };
+    const arquivo = document.getElementById('inputImagem').files[0];
+    let imagem_url = document.getElementById('imagemUrl').value.trim();
 
     const btn = document.getElementById('btnSalvar');
     btn.disabled = true;
 
     try {
+        if (arquivo) {
+            imagem_url = await fazer_upload_imagem(arquivo);
+            document.getElementById('imagemUrl').value = imagem_url;
+        }
+
+        if (!imagem_url) {
+            document.getElementById('vTxt').textContent = 'Selecione uma imagem para o produto.';
+            document.getElementById('vMsg').classList.add('show');
+            return;
+        }
+
+        const payload = {
+            nome:      document.getElementById('inputNome').value.trim(),
+            categoria: document.getElementById('inputCategoria').value,
+            preco:     parseFloat(document.getElementById('inputPreco').value),
+            stock:     parseInt(document.getElementById('inputStock').value, 10),
+            imagem:    imagem_url,
+            detalhes:  document.getElementById('inputDetalhes').value.trim(),
+        };
+
         const res   = await fetch(id ? `/api/estoque/${id}` : '/api/estoque', {
             method:      id ? 'PATCH' : 'POST',
             credentials: 'same-origin',
@@ -287,7 +308,6 @@ async function salvarProduto() {
             body:        JSON.stringify(payload),
         });
         const dados = await res.json();
-
         if (!res.ok) throw new Error(dados.erro || 'Erro ao salvar.');
 
         toast(id ? 'Produto atualizado.' : 'Produto cadastrado.');
@@ -302,8 +322,6 @@ async function salvarProduto() {
     }
 }
 
-// Modal exclusão
-
 function confirmarDelete(id_produto, nome) {
     id_excluindo = id_produto;
     document.getElementById('excNome').textContent = nome;
@@ -312,7 +330,7 @@ function confirmarDelete(id_produto, nome) {
 
 async function executarDelete() {
     if (id_excluindo === null) return;
-    const btn = document.getElementById('btnConfirmarDelete');
+    const btn    = document.getElementById('btnConfirmarDelete');
     btn.disabled = true;
 
     try {
@@ -322,7 +340,6 @@ async function executarDelete() {
             headers:     { 'X-CSRF-Token': csrf },
         });
         const dados = await res.json();
-
         if (!res.ok) throw new Error(dados.erro || 'Erro ao remover.');
 
         toast('Produto removido do estoque.');
@@ -335,8 +352,6 @@ async function executarDelete() {
     }
 }
 
-// Inicialização
-
 document.addEventListener('DOMContentLoaded', () => {
     setupSidebar();
     modalProd = new bootstrap.Modal(document.getElementById('mProd'));
@@ -348,6 +363,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btnConfirmarDelete').addEventListener('click', executarDelete);
+
+    document.getElementById('inputImagem').addEventListener('change', function () {
+        const arquivo = this.files[0];
+        if (!arquivo) return;
+        mostrar_preview(URL.createObjectURL(arquivo));
+    });
 
     document.getElementById('searchInput').addEventListener('input', e => {
         clearTimeout(timeout_busca);

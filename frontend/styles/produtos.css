@@ -847,3 +847,43 @@ img { display: block; max-width: 100%; }
   background: rgba(172, 42, 42, 0.15);
   color: #ff6b6b;
 }
+
+/* ── Ícone de carrinho na navbar ─────────────────────────────────────────── */
+
+.cart-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  color: var(--chrome-dim);
+  font-size: 1.05rem;
+  transition: color var(--transition), background var(--transition);
+}
+
+.cart-link:hover,
+.cart-link:focus-visible {
+  color: var(--off-white);
+  background: var(--border-subtle);
+}
+
+.cart-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--red-vivid);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  border-radius: 999px;
+  line-height: 1;
+}

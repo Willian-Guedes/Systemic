@@ -3,28 +3,24 @@ declare(strict_types=1);
 
 use Automax\Controllers\ProdutoController;
 use Automax\Controllers\ProdutoNotFoundException;
-
-
 use Automax\Controllers\AuthController;
-use Automax\Config\Database;
 use Automax\Config\DatabaseException;
 
 /*
- * Endpoint: GET /api/produtos?pagina=:n&categoria=:cat
+ * Endpoint: GET /api/produto?id=:id
  *
- * Lista produtos com paginação e filtro opcional por categoria.
+ * Retorna os dados de um único produto e sua lista de relacionados
+ * (mesma categoria, excluindo o próprio produto).
  * Exige autenticação (sessão ativa).
  *
  * Respostas:
- *   200  { produtos: [...], total: int, pagina: int, por_pagina: int, paginas: int }
+ *   200  { produto: {...}, relacionados: [...] }
+ *   400  { erro: "ID de produto inválido." }
  *   401  { erro: "Não autenticado" }
+ *   404  { erro: "Produto não encontrado." }
  *   405  { erro: "Método não permitido" }
  *   500  { erro: "Erro interno" }
  */
-
-
-
-
 
 header('Content-Type: application/json; charset=UTF-8');
 header('X-Content-Type-Options: nosniff');
@@ -39,67 +35,48 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 AuthController::exigir_autenticacao();
 
-$por_pagina = 12;
+$id_produto = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
-$pagina = filter_var($_GET['pagina'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-if ($pagina === false) {
-    $pagina = 1;
+if ($id_produto === false) {
+    http_response_code(400);
+    echo json_encode(['erro' => 'ID de produto inválido.']);
+    exit;
 }
 
-$categorias_permitidas = ['pecas', 'fluidos', 'eletrico', 'todos'];
-$categoria_raw = strtolower(trim($_GET['categoria'] ?? 'todos'));
-$categoria = in_array($categoria_raw, $categorias_permitidas, true) ? $categoria_raw : 'todos';
-
 try {
-    $db     = Database::get_instance();
-    $offset = ($pagina - 1) * $por_pagina;
+    $controller = new ProdutoController();
 
-    $where_sql  = $categoria !== 'todos' ? 'WHERE categoria = :categoria' : '';
-    $params_base = $categoria !== 'todos' ? [':categoria' => $categoria] : [];
-
-    $total = (int) ($db->query_one(
-        "SELECT COUNT(*) AS total FROM produtos {$where_sql}",
-        $params_base
-    )['total'] ?? 0);
-
-    $params_rows = array_merge($params_base, [
-        ':limite' => $por_pagina,
-        ':offset' => $offset,
-    ]);
-
-    $linhas = $db->query(
-        "SELECT id_produto, nome, preco, stock, imagem, categoria
-           FROM produtos
-         {$where_sql}
-          ORDER BY id_produto DESC
-          LIMIT :limite OFFSET :offset",
-        $params_rows
-    );
-
-    $produtos = array_map(fn(array $r): array => [
-        'id'        => (int)   $r['id_produto'],
-        'nome'      =>         $r['nome'],
-        'preco'     => (float) $r['preco'],
-        'stock'     => (int)   $r['stock'],
-        'imagem'    =>         $r['imagem'],
-        'categoria' =>         $r['categoria'],
-    ], $linhas);
+    $produto      = $controller->buscar_por_id($id_produto);
+    $relacionados = $controller->buscar_relacionados($produto['categoria'], $id_produto);
 
     http_response_code(200);
     echo json_encode([
-        'produtos'   => $produtos,
-        'total'      => $total,
-        'pagina'     => $pagina,
-        'por_pagina' => $por_pagina,
-        'paginas'    => (int) ceil($total / $por_pagina),
+        'produto'      => [
+            'id'        => (int)   $produto['id_produto'],
+            'nome'      =>         $produto['nome'],
+            'preco'     => (float) $produto['preco'],
+            'stock'     => (int)   $produto['stock'],
+            'imagem'    =>         $produto['imagem'],
+            'categoria' =>         $produto['categoria'],
+            'detalhes'  =>         $produto['detalhes'],
+        ],
+        'relacionados' => array_map(fn(array $r): array => [
+            'id_produto' => (int)   $r['id_produto'],
+            'nome'       =>         $r['nome'],
+            'preco'      => (float) $r['preco'],
+            'imagem'     =>         $r['imagem'],
+        ], $relacionados),
     ], JSON_UNESCAPED_UNICODE);
 
+} catch (ProdutoNotFoundException $e) {
+    http_response_code(404);
+    echo json_encode(['erro' => 'Produto não encontrado.']);
 } catch (DatabaseException $e) {
-    error_log('[API produtos] DatabaseException: ' . $e->getMessage());
+    error_log('[API produto] DatabaseException: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['erro' => 'Erro interno. Tente novamente mais tarde.']);
 } catch (Throwable $e) {
-    error_log('[API produtos] Throwable: ' . $e->getMessage());
+    error_log('[API produto] Throwable: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['erro' => 'Erro interno inesperado.']);
 }

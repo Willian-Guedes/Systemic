@@ -40,6 +40,10 @@
         </ul>
 
         <div class="navbar-actions d-none d-md-flex">
+          <a href="/carrinho" class="cart-link" aria-label="Ver carrinho">
+            <i class="fas fa-cart-shopping"></i>
+            <span class="cart-badge" hidden>0</span>
+          </a>
           <a href="/auth/login" class="btn-ghost-nav">Entrar</a>
           <a href="/pedir"      class="btn-red-nav">Agendar</a>
         </div>
@@ -59,6 +63,7 @@
           <li><a href="/produtos" class="mobile-nav-link">Produtos</a></li>
           <li><a href="/#sobre"   class="mobile-nav-link">Sobre</a></li>
           <li><a href="https://wa.link/2ub6xt" class="mobile-nav-link" target="_blank" rel="noopener noreferrer">Contato</a></li>
+          <li><a href="/carrinho" class="mobile-nav-link">Carrinho</a></li>
         </ul>
         <div class="mobile-actions">
           <a href="/auth/login" class="btn-ghost-nav w-100 text-center">Entrar</a>
@@ -223,6 +228,7 @@
       menu.setAttribute('aria-hidden', String(!open));
     });
   </script>
+  <script src="/carrinho.js"></script>
   <script src="/pages/produtos/produtos.js"></script>
   <script src="/navbar-session.js" defer></script>
 </body>

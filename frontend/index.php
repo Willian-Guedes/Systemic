@@ -262,6 +262,13 @@ $router->get('/pedir', function () {
     serve_protected_page('/pages/pedir/', __DIR__ . '/pages/pedir/pedir.html');
 });
 
+$router->get('/carrinho', function () {
+    AccessControl::exigir_cliente();
+    serve_protected_page('/pages/carrinho/', __DIR__ . '/pages/carrinho/carrinho.html');
+});
+ 
+
+
 // API de ordens de serviço
 
 $router->get('/api/ordens', function () {

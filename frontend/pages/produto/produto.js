@@ -45,9 +45,15 @@ async function buscar_produto(id) {
     return dados;
 }
 
+// ── Estado do produto carregado ────────────────────────────────────────────
+
+let produto_atual = null;
+
 // ── Renderização do produto ───────────────────────────────────────────────
 
 function renderizar_produto(produto) {
+    produto_atual = produto;
+
     // Título e badge de estoque
     document.getElementById('produto-nome').textContent = produto.nome;
     document.getElementById('produto-categoria').textContent = produto.categoria;
@@ -81,6 +87,39 @@ function renderizar_produto(produto) {
 
     // Atualiza title da aba
     document.title = `${produto.nome} — AUTO MAX`;
+}
+
+// ── Carrinho ────────────────────────────────────────────────────────────
+
+async function tratar_clique_adicionar_carrinho() {
+    if (!produto_atual) return;
+
+    const btn_pedir = document.getElementById('btn-pedir');
+    const input_quantidade = document.getElementById('produto-quantidade');
+    const quantidade = Math.max(1, parseInt(input_quantidade?.value, 10) || 1);
+
+    btn_pedir.disabled = true;
+
+    const logado = await Carrinho.estaLogadoComoCliente();
+
+    if (!logado) {
+        Carrinho.mostrarToast('Faça login como cliente para adicionar ao carrinho.', 'erro');
+        btn_pedir.disabled = false;
+        setTimeout(() => {
+            window.location.href = `/auth/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }, 1200);
+        return;
+    }
+
+    Carrinho.adicionar({
+        id: produto_atual.id,
+        nome: produto_atual.nome,
+        preco: produto_atual.preco,
+        imagem: produto_atual.imagem,
+    }, quantidade);
+
+    Carrinho.mostrarToast(`${produto_atual.nome} adicionado ao carrinho.`);
+    btn_pedir.disabled = false;
 }
 
 // ── Renderização dos relacionados ─────────────────────────────────────────
@@ -160,4 +199,7 @@ async function inicializar() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', inicializar);
+document.addEventListener('DOMContentLoaded', () => {
+    inicializar();
+    document.getElementById('btn-pedir').addEventListener('click', tratar_clique_adicionar_carrinho);
+});

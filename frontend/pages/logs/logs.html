@@ -40,11 +40,6 @@
     <a href="/estoque" class="nav-item rnav r-m" aria-label="Estoque">
       <i class="bi bi-boxes" aria-hidden="true"></i>Estoque
     </a>
-
-    <a href="/agendamentos" class="nav-item rnav r-ag" aria-label="Agendamentos">
-      <i class="bi bi-calendar2-check" aria-hidden="true"></i>Agendamentos
-    </a>
-
     <a href="/fornecedores" class="nav-item rnav r-g" aria-label="Fornecedores">
       <i class="bi bi-truck" aria-hidden="true"></i>Fornecedores
     </a>
@@ -112,7 +107,7 @@
         <i class="bi bi-cash-coin" style="color:var(--green)"></i>
       </div>
       <div>
-        <div class="sc-val" style="color:var(--green)" id="statReceita">—</div>
+
         <div class="sc-lbl">Receita no filtro</div>
       </div>
     </div>
@@ -122,7 +117,7 @@
         <i class="bi bi-tools" style="color:var(--purple)"></i>
       </div>
       <div>
-        <div class="sc-val" style="color:var(--purple)" id="statMdo">—</div>
+
         <div class="sc-lbl">Mão de obra no filtro</div>
       </div>
     </div>
@@ -158,15 +153,9 @@
         <table class="tbl" aria-label="Tabela de logs de serviços concluídos">
           <thead>
             <tr>
-              <th scope="col">#OS</th>
-              <th scope="col">Funcionário</th>
-              <th scope="col">Nível</th>
-              <th scope="col">Cliente</th>
-              <th scope="col">Tipo</th>
-              <th scope="col">Abertura</th>
-              <th scope="col">Fechamento</th>
-              <th scope="col">Orçamento</th>
-              <th scope="col">Mão de obra</th>
+              <th scope="col">Data / Hora</th>
+              <th scope="col">Responsável</th>
+              <th scope="col">Ação</th>
             </tr>
           </thead>
           <tbody id="tabelaBody">

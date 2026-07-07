@@ -20,4 +20,9 @@ COPY apache.conf /etc/apache2/sites-available/000-default.conf
 
 COPY flowgate/ /var/www/html/flowgate/
 
+RUN mkdir -p /var/www/html/automax/uploads/avatars \
+        /var/www/html/automax/uploads/produtos \
+    && chown -R www-data:www-data /var/www/html/automax/uploads \
+    && chmod -R 755 /var/www/html/automax/uploads
+
 EXPOSE 80 8081

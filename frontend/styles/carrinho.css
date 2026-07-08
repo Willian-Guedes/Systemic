@@ -160,3 +160,120 @@
   .cart-item-subtotal { text-align: left; }
   .cart-summary { position: static; margin-top: 1.5rem; }
 }
+
+/* ── Modal cosmético: Pedido concluído ───────────────────────────────────── */
+
+.pedido-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 9, 10, 0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 1rem;
+  animation: pedido-fade-in 0.2s ease;
+}
+
+@keyframes pedido-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.pedido-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: var(--carbon-light);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-deep);
+  padding: 2rem 1.75rem 1.75rem;
+  text-align: center;
+  animation: pedido-slide-up 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes pedido-slide-up {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.pedido-modal-fechar {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  padding: 0.3rem;
+  transition: color var(--transition);
+}
+
+.pedido-modal-fechar:hover { color: var(--off-white); }
+
+.pedido-modal-icone {
+  font-size: 3rem;
+  color: #3fb950;
+  margin-bottom: 0.75rem;
+}
+
+.pedido-modal-titulo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--off-white);
+  font-size: 1.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.pedido-modal-sub {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.pedido-modal-itens {
+  text-align: left;
+  background: var(--carbon-mid);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.pedido-modal-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-body);
+  padding: 0.3rem 0;
+}
+
+.pedido-modal-item + .pedido-modal-item {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.pedido-modal-item-qtd {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.pedido-modal-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: var(--off-white);
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.pedido-modal-total span:last-child { color: var(--red-vivid); }

@@ -115,12 +115,14 @@
         return container;
     }
 
-    function mostrar_toast(mensagem, tipo) {
+    function mostrar_toast(mensagem, tipo, acao) {
         const container = garantir_container_toast();
 
         const toast = document.createElement('div');
-        toast.textContent = mensagem;
         toast.style.cssText = [
+            'display:flex',
+            'align-items:center',
+            'gap:0.9rem',
             'font-family: var(--font-body, sans-serif)',
             'font-size:0.9rem',
             'color:#fff',
@@ -134,6 +136,24 @@
             'transition:opacity 0.25s ease, transform 0.25s ease',
         ].join(';');
 
+        const texto = document.createElement('span');
+        texto.textContent = mensagem;
+        toast.appendChild(texto);
+
+        if (acao && acao.rotulo && acao.href) {
+            const link_acao = document.createElement('a');
+            link_acao.href = acao.href;
+            link_acao.textContent = acao.rotulo;
+            link_acao.style.cssText = [
+                'color:#fff',
+                'font-weight:600',
+                'text-decoration:underline',
+                'white-space:nowrap',
+                'flex-shrink:0',
+            ].join(';');
+            toast.appendChild(link_acao);
+        }
+
         container.appendChild(toast);
 
         requestAnimationFrame(() => {
@@ -141,11 +161,12 @@
             toast.style.transform = 'translateY(0)';
         });
 
+        const duracao = acao ? 4200 : 2600;
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateY(8px)';
             setTimeout(() => toast.remove(), 250);
-        }, 2600);
+        }, duracao);
     }
 
     // ── Verificação de cliente logado ───────────────────────────────────────

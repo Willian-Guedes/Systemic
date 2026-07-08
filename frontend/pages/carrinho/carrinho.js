@@ -5,28 +5,12 @@
  *  1. Ler os itens do carrinho (via window.Carrinho, definido em /carrinho.js)
  *  2. Renderizar a lista de itens com controles de quantidade/remoção
  *  3. Calcular e exibir o resumo (itens e total)
- *  4. Montar o link de finalização via WhatsApp
+ *  4. Exibir o pop-up cosmético de "Pedido concluído" (demonstração — sem
+ *     pagamento ou integração real; ao fechar, o carrinho é esvaziado)
  */
-
-const NUMERO_WHATSAPP = '554733334444';
 
 function formatar_brl(valor) {
     return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
-function montar_link_whatsapp(itens, total) {
-    const linhas = itens.map(item =>
-        `• ${item.quantidade}x ${item.nome} — ${formatar_brl(item.preco * item.quantidade)}`
-    );
-    const mensagem = [
-        'Olá! Gostaria de fazer um pedido:',
-        '',
-        ...linhas,
-        '',
-        `Total: ${formatar_brl(total)}`,
-    ].join('\n');
-
-    return `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
 }
 
 function renderizar_item(item) {
@@ -80,7 +64,6 @@ function renderizar_carrinho() {
     const total = Carrinho.calcularTotal();
     document.getElementById('cart-total-itens').textContent = Carrinho.contarItens();
     document.getElementById('cart-total-preco').textContent = formatar_brl(total);
-    document.getElementById('btn-finalizar').href = montar_link_whatsapp(itens, total);
 }
 
 function inicializar_eventos_item(container) {
@@ -115,9 +98,57 @@ function inicializar_eventos_item(container) {
     });
 }
 
+// ── Modal cosmético: Pedido concluído ─────────────────────────────────────
+// Demonstração apenas — não há integração de pagamento nem envio real.
+// Ao fechar o modal, o carrinho é esvaziado (simula o pedido "concluído").
+
+function preencher_modal_pedido(itens, total) {
+    const container = document.getElementById('pedido-modal-itens');
+    container.innerHTML = itens.map(item => `
+        <div class="pedido-modal-item">
+            <span>${item.nome}</span>
+            <span class="pedido-modal-item-qtd">${item.quantidade}x ${formatar_brl(item.preco)}</span>
+        </div>
+    `).join('');
+
+    document.getElementById('pedido-modal-total-preco').textContent = formatar_brl(total);
+}
+
+function abrir_modal_pedido() {
+    const itens = Carrinho.listar();
+    if (itens.length === 0) return;
+
+    preencher_modal_pedido(itens, Carrinho.calcularTotal());
+    document.getElementById('modal-pedido-concluido').hidden = false;
+    document.body.style.overflow = 'hidden';
+}
+
+function fechar_modal_pedido() {
+    document.getElementById('modal-pedido-concluido').hidden = true;
+    document.body.style.overflow = '';
+    Carrinho.limpar();
+}
+
+function inicializar_modal_pedido() {
+    const overlay = document.getElementById('modal-pedido-concluido');
+
+    document.getElementById('btn-finalizar').addEventListener('click', abrir_modal_pedido);
+    document.getElementById('pedido-modal-fechar').addEventListener('click', fechar_modal_pedido);
+    document.getElementById('pedido-modal-ok').addEventListener('click', fechar_modal_pedido);
+
+    overlay.addEventListener('click', evento => {
+        if (evento.target === overlay) fechar_modal_pedido();
+    });
+
+    document.addEventListener('keydown', evento => {
+        if (evento.key === 'Escape' && !overlay.hidden) fechar_modal_pedido();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     renderizar_carrinho();
     inicializar_eventos_item(document.getElementById('cart-itens'));
+    inicializar_modal_pedido();
 
     document.getElementById('btn-limpar-carrinho').addEventListener('click', () => {
         if (Carrinho.contarItens() === 0) return;

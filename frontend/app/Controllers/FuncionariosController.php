@@ -263,10 +263,12 @@ class FuncionariosController
         $params    = [];
 
         if ($busca !== '') {
-            $condicoes[] = '(nome_funcionario LIKE :busca OR email LIKE :busca)';
-            $params[':busca'] = '%' . $busca . '%';
+            $condicoes[] = '(nome_funcionario LIKE :busca_nome OR email LIKE :busca_email)';
+            $termo_busca = '%' . $busca . '%';
+            $params[':busca_nome']  = $termo_busca;
+            $params[':busca_email'] = $termo_busca;
         }
-
+        
         if ($nivel !== '') {
             $condicoes[] = 'nivel_de_acesso = :nivel';
             $params[':nivel'] = $nivel;

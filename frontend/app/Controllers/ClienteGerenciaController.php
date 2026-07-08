@@ -302,8 +302,11 @@ class ClienteGerenciaController
         $params    = [];
 
         if ($busca !== '') {
-            $condicoes[] = '(nome_cliente LIKE :busca OR email LIKE :busca OR CPF LIKE :busca)';
-            $params[':busca'] = '%' . $busca . '%';
+            $condicoes[] = '(nome_cliente LIKE :busca_nome OR email LIKE :busca_email OR CPF LIKE :busca_cpf)';
+            $termo_busca = '%' . $busca . '%';
+            $params[':busca_nome']  = $termo_busca;
+            $params[':busca_email'] = $termo_busca;
+            $params[':busca_cpf']   = $termo_busca;
         }
 
         if ($vip === '1' || $vip === '0') {

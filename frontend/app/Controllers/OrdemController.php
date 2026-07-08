@@ -79,6 +79,24 @@ class OrdemController
         }
     }
 
+    private static function id_funcionario_sessao(): ?int
+    {
+        $id = $_SESSION['funcionario_id'] ?? null;
+        return $id !== null ? (int)$id : null;
+    }
+
+    private static function registrar_log(Database $db, ?int $id_funcionario, string $detalhe): void
+    {
+        try {
+            $db->execute(
+                'INSERT INTO logs (id_funcionario, detalhe) VALUES (:id_funcionario, :detalhe)',
+                [':id_funcionario' => $id_funcionario, ':detalhe' => $detalhe]
+            );
+        } catch (\Throwable $e) {
+            error_log('[OrdemController] registrar_log: ' . $e->getMessage());
+        }
+    }
+
     // ─── GET /api/ordens ─────────────────────────────────────
 
     public static function listar(): void
@@ -179,6 +197,9 @@ class OrdemController
             if (!empty($body['pecas']) && is_array($body['pecas'])) {
                 self::salvar_pecas($db, $id_ordem, $body['pecas']);
             }
+
+            $id_func = self::id_funcionario_sessao();
+            self::registrar_log($db, $id_func, "OS #{$id_ordem} criada — tipo: {$tipo_ordem} | cliente: {$id_cliente}");
 
             $db->commit();
             self::json(201, ['ok' => true, 'id_ordem' => $id_ordem]);
@@ -319,6 +340,9 @@ class OrdemController
                 self::salvar_pecas($db, $id_ordem, $body['pecas']);
             }
 
+            $id_func = self::id_funcionario_sessao();
+            self::registrar_log($db, $id_func, "OS #{$id_ordem} concluída — fechamento: {$fechamento}");
+
             $db->commit();
             self::json(200, ['ok' => true]);
 
@@ -350,6 +374,9 @@ class OrdemController
             if ($afetados === 0) {
                 self::json(404, ['erro' => 'OS não encontrada.']); return;
             }
+
+            $id_func = self::id_funcionario_sessao();
+            self::registrar_log($db, $id_func, "OS #{$id_ordem} removida.");
 
             self::json(200, ['ok' => true]);
 

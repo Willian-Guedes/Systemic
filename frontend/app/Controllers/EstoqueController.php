@@ -112,8 +112,9 @@ class EstoqueController
             return;
         }
 
-        if (!is_dir(self::IMAGEM_DIR)) {
-            mkdir(self::IMAGEM_DIR, 0755, true);
+        if (!is_dir(self::IMAGEM_DIR) && !@mkdir(self::IMAGEM_DIR, 0755, true) && !is_dir(self::IMAGEM_DIR)) {
+            self::json(500, ['erro' => 'Não foi possível criar o diretório de uploads.']);
+            return;
         }
 
         $nome_arquivo = uniqid('prod_', true) . '.webp';

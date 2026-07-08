@@ -10,15 +10,14 @@ use Automax\Auth\AccessControl;
 
 class LogsController
 {
-    private const POR_PAGINA  = 20;
-    private const NIVEIS_VALIDOS = ['gerente', 'mecanico', 'recepcao'];
+    private const POR_PAGINA = 20;
 
     public static function listar(): void
     {
         AccessControl::exigir_permissao('logs.visualizar');
 
-        $pagina     = self::validar_int_positivo($_GET['pagina']      ?? '1') ?: 1;
-        $busca      = trim($_GET['busca']      ?? '');
+        $pagina      = self::validar_int_positivo($_GET['pagina']      ?? '1') ?: 1;
+        $busca       = trim($_GET['busca']       ?? '');
         $funcionario = self::validar_int_positivo($_GET['funcionario'] ?? '') ?: null;
         $data_inicio = trim($_GET['data_inicio'] ?? '');
         $data_fim    = trim($_GET['data_fim']    ?? '');
@@ -34,46 +33,36 @@ class LogsController
 
             $total = (int) ($db->query_one(
                 "SELECT COUNT(*) AS total
-                   FROM ordem o
-                   LEFT JOIN funcionarios f ON f.id_funcionario = o.id_funcionario
-                   LEFT JOIN clientes c     ON c.id_cliente     = o.id_cliente
+                   FROM logs l
+                   LEFT JOIN funcionarios f ON f.id_funcionario = l.id_funcionario
                   {$where_sql}",
                 $params_base
             )['total'] ?? 0);
 
             $linhas = $db->query(
-                "SELECT o.id_ordem,
-                        o.tipo_ordem,
-                        o.status,
-                        DATE_FORMAT(o.abertura,   '%Y-%m-%d') AS abertura,
-                        DATE_FORMAT(o.fechamento, '%Y-%m-%d') AS fechamento,
-                        o.mao_de_obra,
-                        o.orcamento,
+                "SELECT l.id_log,
+                        l.detalhe,
+                        DATE_FORMAT(l.momento_acao, '%Y-%m-%d') AS data_acao,
+                        l.momento_acao AS momento_completo,
                         f.id_funcionario,
                         f.nome_funcionario,
-                        f.nivel_de_acesso,
-                        c.nome_cliente
-                   FROM ordem o
-                   LEFT JOIN funcionarios f ON f.id_funcionario = o.id_funcionario
-                   LEFT JOIN clientes c     ON c.id_cliente     = o.id_cliente
+                        f.nivel_de_acesso
+                   FROM logs l
+                   LEFT JOIN funcionarios f ON f.id_funcionario = l.id_funcionario
                   {$where_sql}
-                  ORDER BY o.fechamento DESC, o.id_ordem DESC
+                  ORDER BY l.momento_acao DESC
                   LIMIT :limite OFFSET :offset",
                 array_merge($params_base, [':limite' => self::POR_PAGINA, ':offset' => $offset])
             );
 
             $registros = array_map(fn(array $r): array => [
-                'id_ordem'         => (int)   $r['id_ordem'],
-                'tipo_ordem'       =>          $r['tipo_ordem'],
-                'status'           =>          $r['status'],
-                'abertura'         =>          $r['abertura'],
-                'fechamento'       =>          $r['fechamento'],
-                'mao_de_obra'      => isset($r['mao_de_obra']) ? (float)$r['mao_de_obra'] : null,
-                'orcamento'        => isset($r['orcamento'])   ? (float)$r['orcamento']   : null,
-                'id_funcionario'   => $r['id_funcionario']   ? (int)$r['id_funcionario'] : null,
-                'nome_funcionario' =>          $r['nome_funcionario'],
-                'nivel_de_acesso'  =>          $r['nivel_de_acesso'],
-                'nome_cliente'     =>          $r['nome_cliente'],
+                'id_log'           => (int) $r['id_log'],
+                'detalhe'          =>       $r['detalhe'],
+                'data_acao'        =>       $r['data_acao'],
+                'momento_completo' =>       $r['momento_completo'],
+                'id_funcionario'   => $r['id_funcionario'] ? (int)$r['id_funcionario'] : null,
+                'nome_funcionario' =>       $r['nome_funcionario'],
+                'nivel_de_acesso'  =>       $r['nivel_de_acesso'],
             ], $linhas);
 
             self::responder_json([
@@ -111,36 +100,32 @@ class LogsController
         }
     }
 
-    private static function montar_filtros(
-        string $busca,
-        ?int   $funcionario,
-        string $data_inicio,
-        string $data_fim
-    ): array {
-        $conds  = ["o.status = 'concluida'"];
+    private static function montar_filtros(string $busca, ?int $funcionario, string $data_inicio, string $data_fim): array
+    {
+        $conds  = [];
         $params = [];
 
         if ($busca !== '') {
-            $conds[]          = '(f.nome_funcionario LIKE :busca OR c.nome_cliente LIKE :busca OR o.tipo_ordem LIKE :busca)';
+            $conds[]          = '(f.nome_funcionario LIKE :busca OR l.detalhe LIKE :busca)';
             $params[':busca'] = '%' . $busca . '%';
         }
 
         if ($funcionario !== null) {
-            $conds[]               = 'o.id_funcionario = :funcionario';
+            $conds[]               = 'l.id_funcionario = :funcionario';
             $params[':funcionario'] = $funcionario;
         }
 
         if ($data_inicio !== '') {
-            $conds[]               = 'o.fechamento >= :data_inicio';
+            $conds[]               = 'DATE(l.momento_acao) >= :data_inicio';
             $params[':data_inicio'] = $data_inicio;
         }
 
         if ($data_fim !== '') {
-            $conds[]            = 'o.fechamento <= :data_fim';
+            $conds[]            = 'DATE(l.momento_acao) <= :data_fim';
             $params[':data_fim'] = $data_fim;
         }
 
-        $where_sql = 'WHERE ' . implode(' AND ', $conds);
+        $where_sql = $conds ? 'WHERE ' . implode(' AND ', $conds) : '';
         return [$where_sql, $params];
     }
 

@@ -6,6 +6,8 @@ namespace Automax\Controllers;
 
 use Automax\Config\Database;
 use Automax\Config\DatabaseException;
+use Automax\Support\Validador;
+use Automax\Support\ErroValidacao;
 
 /**
  * Agendamento de serviços (/pedir).
@@ -36,9 +38,10 @@ class AgendamentoController
             return;
         }
 
-        $erros = self::validar($body);
-        if (!empty($erros)) {
-            self::json(422, ['ok' => false, 'erro' => implode(' ', $erros)]);
+        try {
+            $dados = self::validar_e_normalizar($body);
+        } catch (ErroValidacao $e) {
+            self::json(422, ['ok' => false, 'erro' => $e->getMessage()]);
             return;
         }
 
@@ -53,20 +56,20 @@ class AgendamentoController
                     (:nome, :telefone, :email, :placa, :marca, :modelo, :ano,
                      :combustivel, :km, :servico, :sintomas, :descricao, :data_preferida, :turno)',
                 [
-                    ':nome'           => trim($body['nome']),
-                    ':telefone'       => trim($body['telefone']),
+                    ':nome'           => $dados['nome'],
+                    ':telefone'       => $dados['telefone'],
                     ':email'          => $email_conta ?: null,
-                    ':placa'          => strtoupper(trim($body['placa'] ?? '')) ?: null,
-                    ':marca'          => trim($body['marca']),
-                    ':modelo'         => trim($body['modelo']),
-                    ':ano'            => self::ou_null_int($body['ano'] ?? ''),
-                    ':combustivel'    => trim($body['combustivel'] ?? '') ?: null,
-                    ':km'             => self::ou_null_int($body['km'] ?? ''),
-                    ':servico'        => trim($body['servico'] ?? ''),
-                    ':sintomas'       => trim($body['sintomas'] ?? '') ?: null,
-                    ':descricao'      => trim($body['descricao'] ?? '') ?: null,
-                    ':data_preferida' => $body['data_preferida'],
-                    ':turno'          => $body['turno'] ?? null,
+                    ':placa'          => $dados['placa'],
+                    ':marca'          => $dados['marca'],
+                    ':modelo'         => $dados['modelo'],
+                    ':ano'            => $dados['ano'],
+                    ':combustivel'    => $dados['combustivel'],
+                    ':km'             => $dados['km'],
+                    ':servico'        => $dados['servico'],
+                    ':sintomas'       => $dados['sintomas'],
+                    ':descricao'      => $dados['descricao'],
+                    ':data_preferida' => $dados['data_preferida'],
+                    ':turno'          => $dados['turno'],
                 ]
             );
 
@@ -77,42 +80,57 @@ class AgendamentoController
         }
     }
 
-    private static function validar(array $body): array
+    /**
+     * Valida todos os campos do formulário público de agendamento e
+     * devolve os valores já normalizados, prontos para o INSERT.
+     * Lança ErroValidacao no primeiro campo inválido.
+     */
+    private static function validar_e_normalizar(array $body): array
     {
-        $erros = [];
+        $nome     = Validador::texto($body['nome']     ?? null, 'Nome', 3, 255);
+        $telefone = Validador::texto($body['telefone'] ?? null, 'Telefone', 8, 30);
+        $marca    = Validador::texto($body['marca']    ?? null, 'Marca do veículo', 2, 100);
+        $modelo   = Validador::texto($body['modelo']   ?? null, 'Modelo do veículo', 2, 100);
+        $servico  = Validador::texto($body['servico']  ?? null, 'Serviço', 1, 100);
 
-        if (empty(trim($body['nome']     ?? ''))) $erros[] = 'Nome é obrigatório.';
-        if (empty(trim($body['telefone'] ?? ''))) $erros[] = 'Telefone é obrigatório.';
-        if (empty(trim($body['marca']    ?? ''))) $erros[] = 'Marca do veículo é obrigatória.';
-        if (empty(trim($body['modelo']   ?? ''))) $erros[] = 'Modelo do veículo é obrigatório.';
+        $placa       = Validador::texto($body['placa']       ?? null, 'Placa', 1, 8, false);
+        $combustivel = Validador::texto($body['combustivel'] ?? null, 'Combustível', 1, 30, false);
+        $sintomas    = Validador::texto($body['sintomas']    ?? null, 'Sintomas', 1, 255, false);
+        $descricao   = Validador::texto($body['descricao']   ?? null, 'Descrição', 1, 1000, false);
 
-        $servico = trim($body['servico'] ?? '');
-        if ($servico === '' || mb_strlen($servico) > 100) {
-            $erros[] = 'Selecione o serviço desejado.';
-        }
+        // Ano do veículo: intervalo plausível evita tanto negativos quanto
+        // valores absurdos (ex.: ano 99999) sendo gravados no histórico.
+        $ano = Validador::inteiro($body['ano'] ?? null, 'Ano do veículo', 1900, 2100, false);
+        $km  = Validador::inteiro($body['km']  ?? null, 'Quilometragem', 0, 2_000_000, false);
 
-        $data_preferida = $body['data_preferida'] ?? '';
+        $data_preferida = trim((string) ($body['data_preferida'] ?? ''));
         if (!self::data_valida($data_preferida)) {
-            $erros[] = 'Data preferida inválida.';
+            throw new ErroValidacao('Data preferida inválida.');
         }
 
-        $turno = $body['turno'] ?? null;
-        if ($turno !== null && $turno !== '' && !in_array($turno, self::TURNOS_VALIDOS, true)) {
-            $erros[] = 'Turno inválido.';
-        }
+        $turno = Validador::whitelist($body['turno'] ?? '', 'Turno', [...self::TURNOS_VALIDOS, '']);
 
-        return $erros;
+        return [
+            'nome'           => $nome,
+            'telefone'       => $telefone,
+            'placa'          => $placa !== null ? strtoupper($placa) : null,
+            'marca'          => $marca,
+            'modelo'         => $modelo,
+            'ano'            => $ano,
+            'combustivel'    => $combustivel,
+            'km'             => $km,
+            'servico'        => $servico,
+            'sintomas'       => $sintomas,
+            'descricao'      => $descricao,
+            'data_preferida' => $data_preferida,
+            'turno'          => $turno !== '' ? $turno : null,
+        ];
     }
 
     private static function data_valida(string $data): bool
     {
         $partes = \DateTime::createFromFormat('Y-m-d', $data);
         return $partes !== false && $partes->format('Y-m-d') === $data;
-    }
-
-    private static function ou_null_int(mixed $valor): ?int
-    {
-        return $valor !== '' && $valor !== null ? (int) $valor : null;
     }
 
     private static function ler_body(): ?array

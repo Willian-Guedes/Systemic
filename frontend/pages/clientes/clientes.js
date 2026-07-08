@@ -390,6 +390,35 @@ function aplicar_mascara_celular(valor) {
     return '(' + d.slice(0,2) + ') ' + d.slice(2,7) + '-' + d.slice(7);
 }
 
+// Conta quantos dígitos existem antes de uma posição de cursor no texto mascarado
+function contar_digitos_ate(texto, posicao) {
+    return texto.slice(0, posicao).replace(/\D/g, '').length;
+}
+
+// Acha a posição no texto mascarado logo após o N-ésimo dígito
+function posicao_apos_digito(texto_mascarado, quantidade_digitos) {
+    if (quantidade_digitos <= 0) return 0;
+
+    let digitos_vistos = 0;
+    for (let i = 0; i < texto_mascarado.length; i++) {
+        if (/\d/.test(texto_mascarado[i])) {
+            digitos_vistos++;
+            if (digitos_vistos === quantidade_digitos) return i + 1;
+        }
+    }
+    return texto_mascarado.length;
+}
+
+// Aplica uma função de máscara em um input preservando a posição do cursor
+function aplicar_mascara_com_cursor(input, funcao_mascara) {
+    const digitos_antes_do_cursor = contar_digitos_ate(input.value, input.selectionStart);
+
+    input.value = funcao_mascara(input.value);
+
+    const nova_posicao = posicao_apos_digito(input.value, digitos_antes_do_cursor);
+    input.setSelectionRange(nova_posicao, nova_posicao);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     modalCli = new bootstrap.Modal(document.getElementById('mCli'));
     modalExc = new bootstrap.Modal(document.getElementById('mExc'));
@@ -397,15 +426,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnConfirmarDelete').addEventListener('click', executarExclusao);
 
     document.getElementById('inputCpf').addEventListener('input', function () {
-        const pos = this.selectionStart;
-        this.value = aplicar_mascara_cpf(this.value);
-        this.setSelectionRange(pos, pos);
+        aplicar_mascara_com_cursor(this, aplicar_mascara_cpf);
     });
 
     document.getElementById('inputCelular').addEventListener('input', function () {
-        const pos = this.selectionStart;
-        this.value = aplicar_mascara_celular(this.value);
-        this.setSelectionRange(pos, pos);
+        aplicar_mascara_com_cursor(this, aplicar_mascara_celular);
     });
 
     setupSidebar();

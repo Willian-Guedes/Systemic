@@ -553,7 +553,7 @@ $router->get('/uploads/avatars/:arquivo', function (array $params) {
     exit;
 });
 
-// Dispatch
+// Dispatch hehe
 
 try {
     $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS clientes (
     celular       VARCHAR(20)    NOT NULL,
     email         VARCHAR(255)   NOT NULL,
     senha         VARBINARY(255) NOT NULL,
+    vip           TINYINT(1)     NOT NULL DEFAULT 0,
     PRIMARY KEY (id_cliente),
     UNIQUE KEY uq_clientes_cpf   (CPF),
     UNIQUE KEY uq_clientes_email (email)

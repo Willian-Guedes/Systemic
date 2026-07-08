@@ -66,6 +66,9 @@ function init_user_display() {
   document.querySelectorAll('.rnav.r-m').forEach(el => {
     if (!perms.includes('estoque.visualizar')) el.style.display = 'none';
   });
+  document.querySelectorAll('.rnav.r-c').forEach(el => {
+    if (!perms.includes('clientes.gerenciar')) el.style.display = 'none';
+  });
 }
 
 function inject_csrf_logout() {

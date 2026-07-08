@@ -222,8 +222,11 @@ class AgendamentoGerenciaController
         $params    = [];
 
         if ($busca !== '') {
-            $condicoes[] = '(nome LIKE :busca OR placa LIKE :busca OR servico LIKE :busca)';
-            $params[':busca'] = "%{$busca}%";
+            $condicoes[] = '(nome LIKE :busca_nome OR placa LIKE :busca_placa OR servico LIKE :busca_servico)';
+            $termo_busca = "%{$busca}%";
+            $params[':busca_nome']    = $termo_busca;
+            $params[':busca_placa']   = $termo_busca;
+            $params[':busca_servico'] = $termo_busca;
         }
 
         if ($status !== '') {

@@ -27,7 +27,7 @@ try {
     $db = Database::get_instance();
 
     $clientes = $db->query_all(
-        'SELECT id_cliente AS id, nome_cliente AS nome
+        'SELECT id_cliente AS id, nome_cliente AS nome, vip
            FROM clientes
           ORDER BY nome_cliente ASC'
     );

@@ -855,7 +855,7 @@ async function carregarDados() {
 
       cliMap = {};
       for (const c of (suporte.clientes ?? [])) {
-        cliMap[String(c.id)] = { nome: c.nome, vip: false };
+        cliMap[String(c.id)] = { nome: c.nome, vip: !!c.vip };
       }
 
       veicMap = suporte.veiculos_por_cliente ?? {};

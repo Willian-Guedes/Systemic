@@ -30,7 +30,7 @@
   --off-white:     #ECEDEF;
   --text-body:     #C0C2C7;
   --text-dim:      #858890;
-  --text-faint:    #4E525C;
+  --text-faint:    aliceblue;
 
   /* Bordas */
   --border-subtle: rgba(255, 255, 255, 0.07);
@@ -159,6 +159,7 @@ body {
   text-transform: uppercase;
   color: var(--text-faint);
   margin-top: 3px;
+  color: aliceblue;
 }
 
 /* Profile */
@@ -427,6 +428,7 @@ body {
   font-weight: 400;
   margin-bottom: 5px;
   text-transform: uppercase;
+  color: aliceblue;
 }
 
 .pt-acc { color: var(--red-vivid); }
@@ -488,6 +490,7 @@ body {
   text-transform: uppercase;
   color: var(--text-faint);
   margin-top: 3px;
+  color: aliceblue;
 }
 
 /* ── TOOLBAR ──────────────────────────────────────────────── */

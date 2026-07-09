@@ -764,7 +764,10 @@ select.form-control {
   background-position: right 0.85rem center;
   padding-right: 2.25rem;
 }
-select.form-control option { background: var(--carbon-mid); }
+select.form-control option { 
+  background: var(--carbon-mid); 
+  color: aliceblue;
+}
 
 .form-hint {
   font-size: 0.78rem;

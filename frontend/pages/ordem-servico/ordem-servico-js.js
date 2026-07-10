@@ -652,7 +652,7 @@ function renderPecas() {
                 style="display:none;position:absolute;z-index:200;left:8px;right:8px;top:100%;
                        background:var(--surface-panel);border:1px solid var(--border-mid);
                        border-radius:6px;margin:2px 0 0;padding:4px 0;list-style:none;
-                       max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)"
+                       max-height:260px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)"
                 role="listbox" aria-label="Sugestões da Flowgate">
             </ul>
           </td>
@@ -699,7 +699,11 @@ function agendarBuscaPeca(indice, termo) {
     return;
   }
 
-  dropdown.innerHTML = '<li style="padding:8px 12px;font-size:12px;color:var(--text-faint)">Buscando…</li>';
+  dropdown.innerHTML = `
+    <li style="padding:14px 12px;display:flex;align-items:center;gap:8px;justify-content:center">
+      <span class="spinner-border spinner-border-sm" style="color:var(--text-faint);width:13px;height:13px;border-width:2px" aria-hidden="true"></span>
+      <span style="font-size:11.5px;color:var(--text-faint)">Buscando…</span>
+    </li>`;
   dropdown.style.display = 'block';
 
   peca_timers[indice] = setTimeout(() => buscarPecasFlowgate(indice, termo.trim()), 300);
@@ -719,43 +723,65 @@ async function buscarPecasFlowgate(indice, termo) {
  
     const itens_flowgate = pecas_flowgate.map(p => `
       <li role="option"
-          style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--border-subtle)"
+          class="peca-opcao"
+          style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border-subtle);transition:background .12s"
           data-nome="${esc(p.nome)}"
           data-preco="${p.preco}"
           onmousedown="selecionarPecaEl(${indice}, this)"
+          onmouseenter="this.style.background='rgba(99,102,241,.08)'"
+          onmouseleave="this.style.background='transparent'"
           title="${esc(p.sku)} · ${esc(p.fornecedora?.nome ?? '')}">
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.2);color:#a5b4fc;font-family:var(--font-mono);letter-spacing:.05em">FLOWGATE</span>
-          <span style="font-weight:500;color:var(--text-primary)">${esc(p.nome)}</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="display:flex;align-items:center;gap:7px;min-width:0">
+            <i class="bi bi-cloud-check-fill" style="color:#a5b4fc;font-size:12px;flex-shrink:0" aria-hidden="true"></i>
+            <span style="font-weight:600;font-size:12.5px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.nome)}</span>
+          </div>
+          <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green);flex-shrink:0">R$ ${p.preco.toFixed(2)}</span>
         </div>
-        <div style="color:var(--text-faint);font-size:11px;font-family:var(--font-mono);margin-top:2px">
-          ${esc(p.sku)} · R$ ${p.preco.toFixed(2)} · ${esc(p.fornecedora?.nome ?? '')}
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <span style="font-size:8.5px;padding:1px 6px;border-radius:3px;background:rgba(99,102,241,.18);color:#a5b4fc;font-family:var(--font-mono);letter-spacing:.06em;font-weight:600">FLOWGATE</span>
+          <span style="color:var(--text-faint);font-size:10.5px;font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.sku)} · ${esc(p.fornecedora?.nome ?? '')}</span>
         </div>
       </li>`).join('');
- 
+
     const itens_estoque = pecas_estoque.map(p => `
       <li role="option"
-          style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--border-subtle)"
+          class="peca-opcao"
+          style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border-subtle);transition:background .12s"
           data-nome="${esc(p.nome)}"
           data-preco="0"
           onmousedown="selecionarPecaEl(${indice}, this)"
+          onmouseenter="this.style.background='rgba(34,197,94,.08)'"
+          onmouseleave="this.style.background='transparent'"
           title="Estoque interno · informe o valor unitário manualmente">
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(34,197,94,.15);color:#86efac;font-family:var(--font-mono);letter-spacing:.05em">ESTOQUE</span>
-          <span style="font-weight:500;color:var(--text-primary)">${esc(p.nome)}</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="display:flex;align-items:center;gap:7px;min-width:0">
+            <i class="bi bi-box-seam-fill" style="color:var(--green);font-size:12px;flex-shrink:0" aria-hidden="true"></i>
+            <span style="font-weight:600;font-size:12.5px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.nome)}</span>
+          </div>
+          <span style="font-family:var(--font-mono);font-size:10.5px;font-weight:600;color:var(--text-faint);flex-shrink:0">informe R$</span>
         </div>
-        <div style="color:var(--text-faint);font-size:11px;font-family:var(--font-mono);margin-top:2px">
-          ${p.quantidade} em estoque · ${esc(p.nome_fornecedor)} · informe o valor
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <span style="font-size:8.5px;padding:1px 6px;border-radius:3px;background:rgba(34,197,94,.18);color:var(--green);font-family:var(--font-mono);letter-spacing:.06em;font-weight:600">ESTOQUE</span>
+          <span style="color:var(--text-faint);font-size:10.5px;font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.quantidade} un. · ${esc(p.nome_fornecedor)}</span>
         </div>
       </li>`).join('');
- 
+
     const todos = itens_flowgate + itens_estoque;
- 
-    dropdown.innerHTML = todos || '<li style="padding:8px 12px;font-size:12px;color:var(--text-faint)">Nenhuma peça encontrada.</li>';
+
+    dropdown.innerHTML = todos || `
+      <li style="padding:16px 12px;text-align:center">
+        <i class="bi bi-search" style="color:var(--text-faint);font-size:16px;opacity:.5" aria-hidden="true"></i>
+        <div style="font-size:11.5px;color:var(--text-faint);margin-top:6px">Nenhuma peça encontrada.</div>
+      </li>`;
     dropdown.style.display = 'block';
  
   } catch {
-    dropdown.innerHTML = '<li style="padding:8px 12px;font-size:12px;color:var(--rose)">Erro ao buscar peças.</li>';
+    dropdown.innerHTML = `
+      <li style="padding:14px 12px;text-align:center">
+        <i class="bi bi-exclamation-triangle-fill" style="color:var(--rose);font-size:14px" aria-hidden="true"></i>
+        <div style="font-size:11.5px;color:var(--rose);margin-top:5px">Erro ao buscar peças.</div>
+      </li>`;
     dropdown.style.display = 'block';
   }
 }
